@@ -20,8 +20,7 @@
           class="filter-item"
           size="mini"
           type="warning"
-          icon="el-icon-plus"
-          @click="excuScan">全部更新</el-button>
+          icon="el-icon-plus">全部更新</el-button>
       </el-button-group>
     </div>
   </div>
@@ -29,7 +28,6 @@
 
 <script>
 import checkPermission from '@/utils/permission' // 权限判断函数
-import { getScanSetting, ScanExcu } from '@/api/scan'
 // 查询条件
 export default {
   props: {
@@ -59,9 +57,6 @@ export default {
       status: ''
     }
   },
-  mounted() {
-    this.getSettings()
-  },
   methods: {
     checkPermission,
     toQuery() {
@@ -80,69 +75,6 @@ export default {
         commands: this.settings.commands
       }
       _this.dialog = true
-    },
-    getSettings() {
-      this.$nextTick(() => {
-        getScanSetting().then(res => {
-          this.settings = res.hosts
-        })
-      })
-    },
-    excuScan() {
-      this.scanLoading = true
-      this.$nextTick(() => {
-        ScanExcu({ 'excu': 'scan' }).then(res => {
-          if (res.code === 200) {
-            this.$message({
-              showClose: true,
-              type: 'success',
-              message: res.detail,
-              duration: 3000
-            })
-          } else {
-            this.$message({
-              showClose: true,
-              type: 'error',
-              message: res.detail,
-              duration: 3000
-            })
-          }
-          this.scanLoading = false
-        })
-      })
-    },
-    excuInbound() {
-      this.$confirm('是否将扫描成功的设备入库?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.inboundLoading = true
-        ScanExcu({ 'excu': 'inbound' }).then(res => {
-          if (res.code === 200) {
-            this.$message({
-              showClose: true,
-              type: 'success',
-              message: res.detail,
-              duration: 3000
-            })
-          } else {
-            this.$message({
-              showClose: true,
-              type: 'error',
-              message: res.detail,
-              duration: 3000
-            })
-          }
-          this.inboundLoading = false
-          this.$parent.init()
-        })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '取消操作'
-        })
-      })
     },
     getPtoggleSelect() {
       this.$parent.toggleSelection(this.$parent.data)

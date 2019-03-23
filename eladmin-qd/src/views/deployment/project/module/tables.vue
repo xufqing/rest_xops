@@ -15,7 +15,7 @@
           <div style="display: inline-block;margin: 0px 1px;">
             <el-button v-if="checkPermission(['admin','project_all','project_edit'])" :loading="initLoading" size="mini" type="success" @click="toInit(scope.row.id)">检查</el-button>
           </div>
-          <el-button v-if="checkPermission(['admin','project_all','project_edit'])" size="mini" type="primary" @click="toDetail(scope.row.id)">详情</el-button>
+          <el-button v-if="checkPermission(['admin','project_all','project_list'])" size="mini" type="primary" @click="toDetail(scope.row.id)">详情</el-button>
           <el-popover
             v-if="checkPermission(['admin','project_all','project_delete'])"
             :ref="scope.row.id"

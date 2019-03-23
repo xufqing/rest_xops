@@ -80,100 +80,97 @@ class UserBuildMenuView(APIView):
     绑定当前用户菜单信息
     '''
     def get_menu_from_role(self, request):
-        try:
-            if request.user:
-                menu_dict = {}
-                menus = request.user.roles.values(
-                    'menus__id',
-                    'menus__name',
-                    'menus__path',
-                    'menus__is_frame',
-                    'menus__component',
-                    'menus__icon',
-                    'menus__sort',
-                    'menus__pid'
-                ).distinct()
-                for menu in menus:
-                    if menu['menus__pid'] is None:
-                        if menu['menus__is_frame']:
-                            # 判断是否外部链接
-                            top_menu = {
-                                'id': menu['menus__id'],
-                                'path': menu['menus__path'],
-                                'component': 'Layout',
-                                'children': [{
-                                    'path': menu['menus__path'],
-                                    'meta': {
-                                        'title': menu['menus__name'],
-                                        'icon': menu['menus__icon']
-                                    }
-                                }],
-                                'pid': menu['menus__pid'],
-                                'sort': menu['menus__sort']
-                            }
-                        else:
-                            if menu['menus__path'] is None:
-                                menu['menus__path'] = ''
-                            top_menu = {
-                                'id': menu['menus__id'],
-                                'name': menu['menus__name'],
-                                'path': '/' + menu['menus__path'],
-                                'redirect': 'noredirect',
-                                'component': 'Layout',
-                                'alwaysShow': True,
+        if request.user:
+            menu_dict = {}
+            menus = request.user.roles.values(
+                'menus__id',
+                'menus__name',
+                'menus__path',
+                'menus__is_frame',
+                'menus__is_show',
+                'menus__component',
+                'menus__icon',
+                'menus__sort',
+                'menus__pid'
+            ).distinct()
+            for item in menus:
+                if item['menus__pid'] is None:
+                    if item['menus__is_frame']:
+                        # 判断是否外部链接
+                        top_menu = {
+                            'id': item['menus__id'],
+                            'path': item['menus__path'],
+                            'component': 'Layout',
+                            'children': [{
+                                'path': item['menus__path'],
                                 'meta': {
-                                    'title': menu['menus__name'],
-                                    'icon': menu['menus__icon']
-                                },
-                                'pid': menu['menus__pid'],
-                                'sort': menu['menus__sort']
-                            }
-                        menu_dict[menu['menus__id']] = top_menu
+                                    'title': item['menus__name'],
+                                    'icon': item['menus__icon']
+                                }
+                            }],
+                            'pid': item['menus__pid'],
+                            'sort': item['menus__sort']
+                        }
                     else:
-                        if menu['menus__is_frame']:
-                            children_menu = {
-                                'id': menu['menus__id'],
-                                'name': menu['menus__name'],
-                                'path': menu['menus__path'],
-                                'component': 'Layout',
-                                'meta': {
-                                    'title': menu['menus__name'],
-                                    'icon': menu['menus__icon'],
-                                },
-                                'pid': menu['menus__pid'],
-                                'sort': menu['menus__sort']
-                            }
-                        elif menu['menus__is_show']:
-                            children_menu = {
-                                'id': menu['menus__id'],
-                                'name': menu['menus__name'],
-                                'path': menu['menus__path'],
-                                'component': menu['menus__component'],
-                                'meta': {
-                                    'title': menu['menus__name'],
-                                    'noCache': True,
-                                },
-                                'hidden': True,
-                                'pid': menu['menus__pid'],
-                                'sort': menu['menus__sort']
-                            }
-                        else:
-                            children_menu = {
-                                'id': menu['menus__id'],
-                                'name': menu['menus__name'],
-                                'path': menu['menus__path'],
-                                'component': menu['menus__component'],
-                                'meta': {
-                                    'title': menu['menus__name'],
-                                    'icon': menu['menus__icon'],
-                                },
-                                'pid': menu['menus__pid'],
-                                'sort': menu['menus__sort']
-                            }
-                        menu_dict[menu['menus__id']] = children_menu
-                return menu_dict
-        except AttributeError:
-            return None
+                        top_menu = {
+                            'id': item['menus__id'],
+                            'name': item['menus__name'],
+                            'path': '/' + item['menus__path'],
+                            'redirect': 'noredirect',
+                            'component': 'Layout',
+                            'alwaysShow': True,
+                            'meta': {
+                                'title': item['menus__name'],
+                                'icon': item['menus__icon']
+                            },
+                            'pid': item['menus__pid'],
+                            'sort': item['menus__sort'],
+                            'children': []
+                        }
+                    menu_dict[item['menus__id']] = top_menu
+                else:
+                    if item['menus__is_frame']:
+                        children_menu = {
+                            'id': item['menus__id'],
+                            'name': item['menus__name'],
+                            'path': item['menus__path'],
+                            'component': 'Layout',
+                            'meta': {
+                                'title': item['menus__name'],
+                                'icon': item['menus__icon'],
+                            },
+                            'pid': item['menus__pid'],
+                            'sort': item['menus__sort']
+                        }
+                    elif item['menus__is_show']:
+                        children_menu = {
+                            'id': item['menus__id'],
+                            'name': item['menus__name'],
+                            'path': item['menus__path'],
+                            'component': item['menus__component'],
+                            'meta': {
+                                'title': item['menus__name'],
+                                'icon': item['menus__icon'],
+                            },
+                            'pid': item['menus__pid'],
+                            'sort': item['menus__sort']
+                        }
+                    else:
+                        children_menu = {
+                            'id': item['menus__id'],
+                            'name': item['menus__name'],
+                            'path': item['menus__path'],
+                            'component': item['menus__component'],
+                            'meta': {
+                                'title': item['menus__name'],
+                                'noCache': True,
+                            },
+                            'hidden': True,
+                            'pid': item['menus__pid'],
+                            'sort': item['menus__sort']
+                        }
+                    menu_dict[item['menus__id']] = children_menu
+            return menu_dict
 
     def get_all_menu_dict(self):
         '''
@@ -278,35 +275,29 @@ class UserBuildMenuView(APIView):
 
     def get(self, request):
         menu_data = []
-        try:
-            if request.user.id is not None:
-                perms = UserInfoView.get_permission_from_role(request)
-                if 'admin' in perms:
-                    menu_data = self.get_all_menus()
-                else:
-                    menu_dict = self.get_menu_from_role(request)
-                    for i in menu_dict:
-                        # 重构所有菜单，子菜单加入父菜单
-                        if menu_dict[i]['pid']:
-                            pid = menu_dict[i]['pid']
-                            parent_menu = menu_dict[pid]
-                            parent_menu['component'] = 'Layout'
-                            parent_menu.setdefault('redirect', 'noredirect')
-                            parent_menu.setdefault('alwaysShow', True)
-                            parent_menu.setdefault('children', []).append(menu_dict[i])
-                            parent_menu['children'] = sorted(parent_menu['children'], key=itemgetter('sort'))
-                        else:
-                            menu_data.append(menu_dict[i])
-                return Response(sorted(menu_data, key=itemgetter('sort')), status=status.HTTP_200_OK)
+        if request.user.id is not None:
+            perms = UserInfoView.get_permission_from_role(request)
+            if 'admin' in perms or request.user.is_superuser:
+                menu_data = self.get_all_menus()
             else:
-                return Response({
-                    'code': '403',
-                    'detail': '请登录后访问'
-                }, status=status.HTTP_403_FORBIDDEN)
-        except KeyError:
+                menu_dict = self.get_menu_from_role(request)
+                for i in menu_dict:
+                    # 重构所有菜单，子菜单加入父菜单
+                    if menu_dict[i]['pid']:
+                        pid = menu_dict[i]['pid']
+                        parent_menu = menu_dict[pid]
+                        parent_menu['component'] = 'Layout'
+                        parent_menu.setdefault('redirect', 'noredirect')
+                        parent_menu.setdefault('alwaysShow', True)
+                        parent_menu.setdefault('children', []).append(menu_dict[i])
+                        parent_menu['children'] = sorted(parent_menu['children'], key=itemgetter('sort'))
+                    else:
+                        menu_data.append(menu_dict[i])
+            return Response(sorted(menu_data, key=itemgetter('sort')), status=status.HTTP_200_OK)
+        else:
             return Response({
                 'code': '403',
-                'detail': '菜单路由出错，请确认父级菜单是否已添加到角色'
+                'detail': '请登录后访问'
             }, status=status.HTTP_403_FORBIDDEN)
 
 
