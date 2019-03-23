@@ -1,0 +1,14 @@
+hosts:
+    net_address:
+            - '172.16.3.0/24'
+            - '172.16.2.100-105'
+    ssh_username: 'root'
+    ssh_password: '1234@abcd.com'
+    ssh_port: '22'
+    ssh_private_key: '/root/.ssh/id_rsa'
+    commands:
+            sys_hostname: 'hostname'
+            mac_address: 'cat /sys/class/net/[^tsbvl]*/address'
+            sn_number: 'dmidecode -s system-serial-number'
+            os_version: 'cat /etc/redhat-release'
+    auth_type: 'key_filename'

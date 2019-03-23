@@ -1,0 +1,16 @@
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (1, '系统管理', 'system', 'system', 0, 0, NULL, NULL, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (2, '用户管理', 'user', 'users', 0, 11, 'system/user/index', 1, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (3, '菜单管理', 'menu', 'menus', 0, 12, 'system/menu/index', 1, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (4, '角色管理', 'role', 'roles', 0, 14, 'system/role/index', 1, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (5, '权限管理', 'permission', 'permissions', 0, 13, 'system/permission/index', 1, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (6, '组织架构', 'peoples', 'organizations', 0, 15, 'system/organization/index', 1, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (7, '配置中心', 'github', 'cmdb', 0, 1, '', NULL, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (8, '数据字典', 'tools', 'dicts', 0, 11, 'cmdb/dict/index', 7, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (9, '资产管理', 'lock', 'asset', 0, 13, 'cmdb/asset/index', 7, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (10, '设备扫描', 'develop', 'scan', 0, 111, 'cmdb/asset/scan/index', 9, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (11, '设备管理', 'error', 'devices', 0, 112, 'cmdb/asset/device/index', 9, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (12, '扫描详情', 'add', 'scan/detail', 0, 999, 'cmdb/asset/scan/detail/index', 9, 0);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (13, '密码管理', 'icon', 'connections', 0, 12, 'cmdb/passwd/index', 7, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (15, '设备详情', '', 'devices/detail', 0, 999, 'cmdb/asset/device/detail/index', 9, 0);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (16, '项目管理', 'monitor', 'projet', 0, 14, 'cmdb/passwd/index', 7, 1);
+INSERT INTO `rbac_menu`(`id`, `name`, `icon`, `path`, `is_frame`, `sort`, `component`, `pid_id`, `is_show`) VALUES (17, '你爱的', 'add', 'http://111', 1, 999, '', 7, 1);
