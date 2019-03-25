@@ -140,7 +140,7 @@ CHANNEL_LAYERS = {
     },
 }
 # 配置ASGI
-ASGI_APPLICATION = "app.websocket.routing.application"
+ASGI_APPLICATION = "rest_xops.routing.application"
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
