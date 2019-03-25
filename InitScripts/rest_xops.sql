@@ -11,7 +11,7 @@
  Target Server Version : 50642
  File Encoding         : 65001
 
- Date: 23/03/2019 15:52:38
+ Date: 25/03/2019 15:23:54
 */
 
 SET NAMES utf8mb4;
@@ -263,7 +263,12 @@ CREATE TABLE `cmdb_devicescaninfo`  (
   `password` varchar(80) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `error_message` varchar(80) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- Records of cmdb_devicescaninfo
+-- ----------------------------
+INSERT INTO `cmdb_devicescaninfo` VALUES (2, '2019-03-23 16:11:32.253081', '2019-03-23 16:12:03.263809', 'Succeed', 'xops\r\n', '00:0c:29:55:56:eb\r\n', 'VMware-56 4d c8 fb b0 d9 3c 2b-62 7c bb 44 fe 55 56 eb\r\n', 'Linux', 'CentOS Linux release 7.5.1804 (Core) \r\n', '', '', '192.168.3.33', 'password', 22, 'root', 'anson0418', '');
 
 -- ----------------------------
 -- Table structure for cmdb_dict
@@ -385,17 +390,17 @@ CREATE TABLE `deployment_project`  (
   `repo_url` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `repo_mode` varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `server_ids` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
-  `last_task_status` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `app_start` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `app_stop` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `app_log_file` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `last_task_status` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `app_start` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `app_stop` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `app_log_file` varchar(150) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of deployment_project
 -- ----------------------------
-INSERT INTO `deployment_project` VALUES (1, '2019-03-23 15:17:58.353902', '2019-03-23 15:17:58.353951', '12348账套', 'ledger', 'dev', NULL, '', 0, '/home/xufeng', '/home/xufenga', '', '', '', '', '', 10, 'asdasd', 'tag', '1', '', '', '', '');
+INSERT INTO `deployment_project` VALUES (1, '2019-03-23 15:17:58.353902', '2019-03-25 15:23:31.851606', '12348账套', 'ledger', 'dev', NULL, 'README.md', 0, '/home/test/xops', '/home/test/release', 'nihao=/home/nihao\ndede=/home/dede', 'echo \'这是部署前的任务，如代码编译\'\necho \'显示自定义变量\'\necho {nihao}\necho {dede}', 'echo \'这是部署后置任务，即上传代码至目标服务器之前的任务\'', 'echo \'这是发布前置任务，即上传代码至目标服务器后，准备发布前的任务，如停止服务\'', 'echo \'这是完成后的任务，如启动服务\'', 5, 'asdasd', 'branch', '1', '', '/home/test/start.sh', '/home/test/stop.sh', '/var/log/messages');
 
 -- ----------------------------
 -- Table structure for django_content_type
@@ -441,7 +446,7 @@ CREATE TABLE `django_migrations`  (
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of django_migrations
@@ -461,6 +466,8 @@ INSERT INTO `django_migrations` VALUES (12, 'rbac', '0001_initial', '2019-03-23 
 INSERT INTO `django_migrations` VALUES (13, 'cmdb', '0001_initial', '2019-03-23 14:00:02.665535');
 INSERT INTO `django_migrations` VALUES (14, 'deployment', '0001_initial', '2019-03-23 14:00:02.719533');
 INSERT INTO `django_migrations` VALUES (15, 'sessions', '0001_initial', '2019-03-23 14:00:02.735608');
+INSERT INTO `django_migrations` VALUES (16, 'deployment', '0002_auto_20190325_1516', '2019-03-25 15:16:57.650824');
+INSERT INTO `django_migrations` VALUES (17, 'deployment', '0003_auto_20190325_1523', '2019-03-25 15:23:29.094700');
 
 -- ----------------------------
 -- Table structure for django_session
@@ -639,11 +646,15 @@ CREATE TABLE `rbac_role_menus`  (
   INDEX `rbac_role_menus_menu_id_180f4f9a_fk_rbac_menu_id`(`menu_id`) USING BTREE,
   CONSTRAINT `rbac_role_menus_menu_id_180f4f9a_fk_rbac_menu_id` FOREIGN KEY (`menu_id`) REFERENCES `rbac_menu` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `rbac_role_menus_role_id_323259a4_fk_rbac_role_id` FOREIGN KEY (`role_id`) REFERENCES `rbac_role` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of rbac_role_menus
 -- ----------------------------
+INSERT INTO `rbac_role_menus` VALUES (11, 2, 7);
+INSERT INTO `rbac_role_menus` VALUES (8, 2, 9);
+INSERT INTO `rbac_role_menus` VALUES (9, 2, 11);
+INSERT INTO `rbac_role_menus` VALUES (10, 2, 15);
 INSERT INTO `rbac_role_menus` VALUES (1, 2, 17);
 INSERT INTO `rbac_role_menus` VALUES (2, 2, 18);
 INSERT INTO `rbac_role_menus` VALUES (3, 2, 20);
@@ -665,13 +676,15 @@ CREATE TABLE `rbac_role_permissions`  (
   INDEX `rbac_role_permission_permission_id_f5e1e866_fk_rbac_perm`(`permission_id`) USING BTREE,
   CONSTRAINT `rbac_role_permission_permission_id_f5e1e866_fk_rbac_perm` FOREIGN KEY (`permission_id`) REFERENCES `rbac_permission` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `rbac_role_permissions_role_id_d10416cb_fk_rbac_role_id` FOREIGN KEY (`role_id`) REFERENCES `rbac_role` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of rbac_role_permissions
 -- ----------------------------
 INSERT INTO `rbac_role_permissions` VALUES (1, 1, 1);
 INSERT INTO `rbac_role_permissions` VALUES (4, 2, 28);
+INSERT INTO `rbac_role_permissions` VALUES (5, 2, 33);
+INSERT INTO `rbac_role_permissions` VALUES (6, 2, 37);
 INSERT INTO `rbac_role_permissions` VALUES (3, 2, 49);
 INSERT INTO `rbac_role_permissions` VALUES (2, 2, 53);
 

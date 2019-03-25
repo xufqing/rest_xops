@@ -25,10 +25,10 @@ class Project(TimeAbstract):
     repo_url = models.CharField(default='', max_length=200)
     repo_mode = models.CharField(default='', max_length=30,blank=True, null=True)
     server_ids = models.CharField(default='',max_length=10,blank=True, null=True, verbose_name='关联主机')
-    last_task_status = models.CharField(max_length=20, default='', verbose_name="状态")
-    app_start = models.CharField(default='', max_length=100, verbose_name='启动脚本')
-    app_stop = models.CharField(default='', max_length=100, verbose_name='停止脚本')
-    app_log_file = models.CharField(default='', max_length=150, verbose_name='日志文件')
+    last_task_status = models.CharField(max_length=20, default='',null=True, blank=True, verbose_name="状态")
+    app_start = models.CharField(default='', max_length=100,blank=True, null=True, verbose_name='启动脚本')
+    app_stop = models.CharField(default='', max_length=100, blank=True, null=True, verbose_name='停止脚本')
+    app_log_file = models.CharField(default='', max_length=150,blank=True, null=True,  verbose_name='日志文件')
 
     class Meta:
         verbose_name = '项目配置'
