@@ -2,44 +2,58 @@ demo地址: http://demo.xufqing.cn
 
 管理员账号:admin 密码admin@1234
 
-***rest_xops前端教程***
+***本项目采用以下技术***
 
-安装npm运行环境(略)
+前端：
 
-修改你的配置文件
+vue 2.5.17
 
-xops_qd_source/config
+elementUI 2.6.0
 
-dev.env.js #开发环境
+websocket
 
-prod.env.js #生成环境
+后端：
 
+django 2.1.4
 
-开发环境：
+django rest framework 3.9.1
 
-```
-cd rest_xops/xops_qd_source
-npm run dev
-#接下来启动后端即可进行调试
-```
+django rest framework-jwt 1.11.0
 
+django channels 2.1.7
 
-生产环境：
-```
-cd rest_xops/xops_qd_source
-npm run build
-```
-生产环境将xops_qd_source/dist目录下生成的文件访问你的服务器nginx目录
+celery 4.2.1
 
+软件运行环境
 
+Python 3.6.8
 
-**rest_xops 后端教程**
+Redis 5.0
 
-安装mysql（略）
+MySql 5.7
 
-安装redis（略）
+***基础环境安装***
 
-创建python虚拟环境
+1、安装npm运行环境(略)
+
+    安装前端项目依赖包
+    
+    cd xops_qd_source/
+    npm install
+
+2、修改你的配置文件
+
+    xops_qd_source/config
+
+    dev.env.js #开发环境
+
+    prod.env.js #生成环境
+
+3、安装mysql（略）
+
+4、安装redis（略）
+
+5、创建python虚拟环境
 
 - 安装  
 yum install git gcc make patch gdbm-devel openssl-devel sqlite-devel readline-devel zlib-devel bzip2-devel libffi-devel -y  
@@ -58,71 +72,62 @@ pyenv virtualenv 3.6.8 rest_xops
 cd 你的项目路径
 pyenv local rest_xops
 ```
+2、安装项目运行模块
 ```
 pip install -r requirements.txt
 ```
 
-登陆MYSQL，创建数据库
+3、登陆MYSQL，创建数据库
 
 ```
 CREATE DATABASE rest_xops DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 ```
 
-执行创建表信息
+<!--4、执行创建表信息-->
 
-python manage.py makemigrations rbac
+<!--python manage.py makemigrations rbac-->
 
-python manage.py makemigrations cmdb
+<!--python manage.py makemigrations cmdb-->
 
-python manage.py makemigrations deployment
+<!--python manage.py makemigrations deployment-->
 
-python manage.py migrate
+<!--python manage.py migrate-->
 
-如果遇到mysql模块的问题
+<!--如果遇到mysql模块的问题-->
 
-ImportError: libmysqlclient.so.18: cannot open shared object file: No such file or directory
+<!--ImportError: libmysqlclient.so.18: cannot open shared object file: No such file or directory-->
 
-则：
+<!--则：-->
 
-ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib64/libmysqlclient.so.18
+<!--ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib64/libmysqlclient.so.18-->
 
-MYSQL导入初始化数据
+4、MYSQL导入初始化数据
 
-mysql> use rest_xops;
+    mysql> use rest_xops;
 
-source /home/xufeng/rest_xops/InitScripts/rest_xops.sql;
-
-
-修改管理员密码（必须操作）
-
-python manage.py changepassword admin
-
-安装扫描工具
-
-yum -y install nmap
-
-安装进程管理
-
-yum -y install supervisor
+    source /home/xufeng/rest_xops/InitScripts/rest_xops.sql;
 
 
-开机启动
+5、修改管理员密码（必须操作）
 
-systemctl enable supervisord
+    python manage.py changepassword admin
+
+6、安装扫描工具
+
+    yum -y install nmap
+
+7、安装进程管理
+
+    yum -y install supervisor
 
 
-启动
-systemctl start supervisord
+8、开机启动
 
+    systemctl enable supervisord
+    systemctl start supervisord
+9、配置supervisor来管理celery
 
-
-开发环境
-
-python manage.py runserver 0.0.0.0:8000
-
-**设置supervisord**
 - celery_worker
-
 ```
 vim /etc/supervisord.d/celery_worker.ini
 
@@ -145,18 +150,43 @@ stderr_logfile=/home/xufeng/rest_xops/logs/flower_celery.log
 autostart=true
 autorestart=true
 priority=900
+
+
+执行
+supervisorctl start all
+
 ```
 
-**生产环境则需以下操作：**
-安装nginx（略）
 
-以下所有/home/xufeng/rest_xops 都改为你的项目地址
+***开发环境的运行***
 
-/home/xufeng/.pyenv/versions/rest_xops 是你的python虚拟环境的版本
+运行前端
+```
+cd rest_xops/xops_qd_source
+npm run dev
+#接下来启动后端即可进行调试
+```
+运行后端
+
+    python manage.py runserver 0.0.0.0:8000
+    
+浏览器登陆
+
+    http://localhost:8013/   前端
+    http://你的后端地址:8000/docs/  API文档地址
+    
+
+***生产环境的运行***
+
+**1、安装nginx（略）**
+
+    以下所有/home/xufeng/rest_xops 都改为你的项目地址
+
+    /home/xufeng/.pyenv/versions/rest_xops 是你的python虚拟环境的版本
 
 
 
-**1、安装uwsgi**
+**2、安装uwsgi**
 
 ```
  cd /home/xufeng/rest_xops
@@ -164,7 +194,7 @@ priority=900
  pip install uwsgi
 
 ```
-**2、设置Uwsgi配置文件**
+**3、设置Uwsgi配置文件**
 
 ```
 vim /etc/xops_uwsgi.ini
@@ -180,7 +210,7 @@ socket =127.0.0.1:8000
 vacuum = true
 
 ```
-**设置supervisord**
+**4、设置supervisord**
 - xops_uwsgi
 ```
 vim /etc/supervisord.d/xops_uwsgi.ini
@@ -211,17 +241,17 @@ stderr_logfile=/home/xufeng/rest_xops/logs/xops_asgi.log
 stdout_logfile_maxbytes = 20MB
 ```
 
-重启
+**6、重启supervisord**
 
-supervisorctl reload
+    supervisorctl reload
 
-systemctl restart supervisord
+    systemctl restart supervisord
 
-supervisorctl start all
+    supervisorctl start all
 
-查看运行状态
+**7、查看运行状态**
 
-supervisorctl status
+    supervisorctl status
 
 以下输出为成功
 
@@ -236,10 +266,14 @@ celery-worker                    RUNNING   pid 15321, uptime 1:42:45
 xops                             RUNNING   pid 15328, uptime 1:42:44
 [root@xuxu xufeng]# supervisorctl status
 ```
+**8、生产静态页面**
+```
+cd rest_xops/xops_qd_source
+npm run build
+```
+将xops_qd_source/dist目录下生成的文件复制到你的服务器nginx web root目录
 
-生成前端页面
-
-配置nginx
+**9、配置NGINX*
 
 ```
 upstream xops {
@@ -255,7 +289,7 @@ server {
     location / {
         try_files $uri $uri/ /index.html;
         add_header access-control-allow-origin *;
-        root /home/xufeng/rest_xops/xops_web;
+        root /home/xufeng/rest_xops/xops_web; # 这是前端静态文件
     }
     location ^~/api  {
 	uwsgi_pass xops;
@@ -286,8 +320,6 @@ server {
     }
 }
 ```
-
-
 最后 http://demo.xufqing.cn（你的地址）登陆访问
 
 

@@ -4,18 +4,14 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import utils.globalvar as gl
 
-class DeployMsgConsumer(AsyncWebsocketConsumer):
+class ConsoleMsgConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
-        if self.scope['user'].is_anonymous:
-            # 未登录关闭连接
-            await self.close()
-        else:
-            await self.channel_layer.group_add(
-                self.scope['user'].username,
-                self.channel_name,
-            )
-            await self.accept()
+        await self.channel_layer.group_add(
+            self.scope['user'].username,
+            self.channel_name,
+        )
+        await self.accept()
 
     async def receive(self, text_data=None, bytes_data=None):
         await self.channel_layer.group_send(
