@@ -2,7 +2,15 @@ demo地址: http://demo.xufqing.cn
 
 管理员账号:admin 密码admin@1234
 
-主要更新地址：[https://github.com/xufqing/rest_xops](https://github.com/xufqing/rest_xops)
+![1.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/1.png)
+
+![2.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/2.png)
+
+![3.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/3.png)
+
+![4.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/4.png)
+
+
 
 ***本项目采用以下技术***
 
