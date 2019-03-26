@@ -189,10 +189,11 @@ class DeployView(APIView):
             # 部署操作
             id = request.data['id']
             webuser = request.user.username
+            alias = request.data['alias']
             self.start_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
-            record_id = str(request.data['alias']) + '_' + str(self.start_time)
+            record_id = str(alias) + '_' + str(self.start_time)
             name = '部署_' + record_id
-            DeployRecord.objects.create(name=name, status='Failed', project_id=int(id))
+            DeployRecord.objects.create(name=name, alias=alias ,status='Failed', project_id=int(id))
             Project.objects.filter(id=id).update(last_task_status='Failed')
             local_log_path = self._path + str(id) + '_' + str(request.data['alias']) + '/logs'
             log = local_log_path + '/' + record_id + '.log'
