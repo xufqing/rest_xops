@@ -4,8 +4,9 @@
 # -*- coding: utf-8 -*-
 
 def _init():
-    global _global_dict
-    _global_dict = {}
+    if not '_global_dict' in globals():
+        global _global_dict
+        _global_dict = {}
 
 def set_value(name, value):
     _global_dict[name] = value

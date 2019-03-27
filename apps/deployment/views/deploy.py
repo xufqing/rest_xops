@@ -293,6 +293,7 @@ class DeployView(APIView):
         elif request.data['excu'] == 'tail_start':
             # 日志监控
             try:
+                filter_text = str(request.data['filter'])
                 app_log_file = request.data['app_log_file']
                 host = request.data['host']
                 webuser = request.user.username
@@ -304,14 +305,13 @@ class DeployView(APIView):
                 passwd = connect_info[0]['password']
                 port = connect_info[0]['port']
                 tail = Tailf()
-                tail.remote_tail(host, port, user, passwd, app_log_file, webuser)
+                tail.remote_tail(host, port, user, passwd, app_log_file, webuser, filter_text)
                 http_status = status.HTTP_200_OK
                 request_status = {
                     'code': 200,
                     'detail': '执行成功!'
                 }
             except Exception as e:
-                print(e)
                 http_status = status.HTTP_400_BAD_REQUEST
                 request_status = {
                     'code': 400,

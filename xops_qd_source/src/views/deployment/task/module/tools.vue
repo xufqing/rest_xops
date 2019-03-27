@@ -1,37 +1,51 @@
 <template>
   <div :style="'width:' + width" class="container">
-    <el-row :gutter="32">
+    <el-card class="box-card">
+      <div class="clearfix">
+        <span>项目名称：{{ project_data.name }}</span>
+      </div>
+    </el-card>
+    <el-row>
       <el-col :span="10">
         <el-card class="box-card">
-          <span>项目管理</span>
-          <el-form ref="project" :model="project_data" :rules="rules" size="small" label-width="80px">
-            <el-form-item label="服务器" prop="server_ids">
-              <el-select v-model="project_data.server_ids" placeholder="请选择服务器">
-                <el-option v-for="item in hosts" :key="item.key" :label="item.label" :value="item.key"/>
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <div style="display: inline-block;margin: 0px 1px;">
-                <el-button :loading="startloading" size="mini" type="success" icon="el-icon-share" @click="doStart">启动</el-button>
-                <el-button :loading="stoploading" size="mini" type="primary" icon="el-icon-plus" @click="doStop">停止</el-button>
-              </div>
-            </el-form-item>
-          </el-form>
+          <div slot="header" class="clearfix">
+            <span>应用管理-{{ project_data.environment }}</span>
+          </div>
+          <div style="height: 153px">
+            <el-form ref="project" :model="project_data" :rules="rules" size="small" label-width="80px">
+              <el-form-item label="服务器" prop="server_ids">
+                <el-select v-model="project_data.server_ids" placeholder="请选择服务器" style="width: 230px;">
+                  <el-option v-for="item in hosts" :key="item.key" :label="item.label" :value="item.key"/>
+                </el-select>
+              </el-form-item>
+              <el-form-item>
+                <div style="display: inline-block;margin: 0px 1px;">
+                  <el-button :loading="startloading" size="mini" type="primary" icon="el-icon-share" @click="doStart">启动应用</el-button>
+                  <el-button :loading="stoploading" size="mini" type="danger" icon="el-icon-plus" @click="doStop">停止应用</el-button>
+                </div>
+              </el-form-item>
+            </el-form>
+          </div>
         </el-card>
       </el-col>
       <el-col :span="14">
         <el-card class="box-card">
-          <span>日志管理</span>
+          <div slot="header" class="clearfix">
+            <span>日志管理-{{ project_data.environment }}</span>
+          </div>
           <el-form ref="log" :model="log_data" :rules="rules" size="small" label-width="80px">
+            <el-form-item label="过滤条件" prop="filter">
+              <el-input v-model="log_data.filter" placeholder="可输入关键字过滤" style="width: 230px;"/>
+            </el-form-item>
             <el-form-item label="服务器" prop="server_ids">
-              <el-select v-model="log_data.server_ids" placeholder="请选择服务器">
+              <el-select v-model="log_data.server_ids" placeholder="请选择服务器" style="width: 230px;">
                 <el-option v-for="item in hosts" :key="item.key" :label="item.label" :value="item.key"/>
               </el-select>
             </el-form-item>
             <el-form-item>
               <div style="display: inline-block;margin: 0px 1px;">
-                <el-button :loading="tailloading" size="mini" type="success" icon="el-icon-share" @click="doTailStart">启动</el-button>
-                <el-button size="mini" type="primary" icon="el-icon-plus" @click="doTailStop">停止</el-button>
+                <el-button :loading="tailloading" size="mini" type="primary" icon="el-icon-share" @click="doTailStart">监控日志</el-button>
+                <el-button size="mini" type="danger" icon="el-icon-plus" @click="doTailStop">停止监控</el-button>
               </div>
             </el-form-item>
           </el-form>
@@ -77,6 +91,7 @@ export default {
       },
       hosts: [],
       log_data: {
+        filter: '',
         server_ids: ''
       },
       data: [],
@@ -146,6 +161,8 @@ export default {
     },
     init() {
       retrieve(this.$route.query.id).then(res => {
+        this.project_data.name = res.name
+        this.project_data.environment = res.environment
         this.project_data.app_start = res.app_start
         this.project_data.app_stop = res.app_stop
         this.project_data.app_bin_path = res.app_bin_path
@@ -214,6 +231,7 @@ export default {
           const form = {
             excu: 'tail_start',
             host: this.log_data.server_ids,
+            filter: this.log_data.filter,
             app_log_file: this.log_data.app_log_file
           }
           DeployExcu(form).then(res => {
@@ -240,6 +258,7 @@ export default {
               message: '执行成功!请等待线程结束.',
               duration: 3500
             })
+            this.tailloading = false
           }).catch(err => {
             this.tailloading = false
             console.log(err)
@@ -266,6 +285,8 @@ export default {
       })
     },
     getColor(text) {
+      const filter_reg = new RegExp(this.log_data.filter, '')
+      const filter = this.log_data.filter.match(filter_reg)
       const info = text.match(/INFO/i)
       const warn = text.match(/WARN/i)
       const debug = text.match(/DEBUG/i)
@@ -281,6 +302,8 @@ export default {
         return text.replace(/\[(.*?)@(.*?)\]/, '<span style="color: #FFA54F;">' + host[0] + '</span>')
       } else if (error) {
         return text.replace(/ERROR/i, '<span style="color: #FF0000;">' + error + '</span>')
+      } else if (filter) {
+        return text.replace(filter_reg, '<span style="color: #FF0000;">' + filter + '</span>')
       } else {
         return text
       }
