@@ -36,7 +36,6 @@ class DeployRecordViewSet(ReadOnlyModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (RbacPermission,)
 
-
 class VersionView(APIView):
     perms_map = ({'*': 'admin'}, {'*': 'deploy_all'}, {'get': 'deploy_excu'})
     permission_classes = (RbacPermission,)
@@ -61,7 +60,7 @@ class VersionView(APIView):
         result = None
         id = request.query_params['id']
         repo = Project.objects.filter(id=int(id)).values('alias', 'repo_url', 'repo_mode')
-        path = self._path + str(id) + '_' + str(repo[0]['alias']) + '/' + repo[0]['alias']
+        path = self._path.rstrip('/') + '/' + str(id) + '_' + str(repo[0]['alias']) + '/' + repo[0]['alias']
         if repo[0]['repo_mode'] == 'tag':
             result = self.get_tag(path)
             result = result.stdout.split('\n')
@@ -85,7 +84,7 @@ class DeployView(APIView):
     def repo_init(self, id):
         if id:
             repo = Project.objects.filter(id=int(id)).values('alias', 'repo_url')
-            path = self._path + str(id) + '_' + str(repo[0]['alias'])
+            path = self._path.rstrip('/') + '/' + str(id) + '_' + str(repo[0]['alias'])
             if not os.path.exists(path): os.makedirs(path)
             if not os.path.exists(path + '/logs'): os.makedirs(path + '/logs')
             localhost = Shell('127.0.0.1')
@@ -195,7 +194,7 @@ class DeployView(APIView):
             name = '部署_' + record_id
             DeployRecord.objects.create(name=name, alias=alias ,status='Failed', project_id=int(id))
             Project.objects.filter(id=id).update(last_task_status='Failed')
-            local_log_path = self._path + str(id) + '_' + str(request.data['alias']) + '/logs'
+            local_log_path = self._path.rstrip('/') + '/' + str(id) + '_' + str(request.data['alias']) + '/logs'
             log = local_log_path + '/' + record_id + '.log'
             version = request.data['version'].strip()
             serverid = request.data['server_ids']
@@ -210,16 +209,18 @@ class DeployView(APIView):
             alias = request.data['alias']
             self.start_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
             record_id = str(alias) + '_' + str(self.start_time)
-            log = self._path + str(project_id) + '_' + str(alias) + '/logs/' + record_id + '.log'
+            log = self._path.rstrip('/') + '/' + str(project_id) + '_' + str(alias) + '/logs/' + record_id + '.log'
             self.do_rollback(id, log, record_id)
             return Response({'record_id': record_id})
 
         elif request.data['excu'] == 'deploymsg':
             # 部署控制台消息读取
             try:
-                file = request.data['file']
-                logfile = self._path + file
+                id = request.data['id']
+                alias = request.data['alias']
+                record = request.data['record']
                 scenario = int(request.data['scenario'])
+                logfile = self._path.rstrip('/') + '/' + str(id) + '_' + str(alias) + '/logs/' + record + '.log'
                 webuser = request.user.username
                 msg = Tailf()
                 if scenario == 0:

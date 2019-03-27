@@ -10,7 +10,6 @@ from rest_framework.generics import ListAPIView
 from errno import errorcode
 import celery
 
-
 class CommonPagination(PageNumberPagination):
     '''
     分页设置
