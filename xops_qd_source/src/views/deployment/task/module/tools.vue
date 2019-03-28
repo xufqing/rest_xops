@@ -11,7 +11,7 @@
           <div slot="header" class="clearfix">
             <span>应用管理-{{ project_data.environment }}</span>
           </div>
-          <div style="height: 153px">
+          <div style="height: 152px">
             <el-form ref="project" :model="project_data" :rules="rules" size="small" label-width="80px">
               <el-form-item label="服务器" prop="server_ids">
                 <el-select v-model="project_data.server_ids" placeholder="请选择服务器" style="width: 230px;">
@@ -55,6 +55,9 @@
     <el-card class="box-card">
       <el-tooltip content="返回上一页" class="closepage item" effect="dark" placement="left">
         <el-button type="info" size="mini" circle @click="closeTag"><svg-icon icon-class="return"/></el-button>
+      </el-tooltip>
+      <el-tooltip content="清空控制台输出" class="clean item" effect="dark" placement="left">
+        <el-button type="info" size="mini" circle @click="clean"><svg-icon icon-class="clean"/></el-button>
       </el-tooltip>
       <el-tooltip :content="content" class="lock item" effect="dark" placement="left">
         <el-button type="info" size="mini" circle @click="doLock"><svg-icon :icon-class="ico"/></el-button>
@@ -284,6 +287,15 @@ export default {
         })
       })
     },
+    clean() {
+      this.data = ''
+      this.$message({
+        showClose: true,
+        type: 'success',
+        message: '清空控制台输出成功！',
+        duration: 3500
+      })
+    },
     getColor(text) {
       const filter_reg = new RegExp(this.log_data.filter, '')
       const filter = this.log_data.filter.match(filter_reg)
@@ -361,10 +373,15 @@ textarea {
   z-index: 100000;
 }
 .closepage {
-  margin: 40px;
   position: fixed;
-  right: 5px;
-  bottom: 6.8%;
+  right: 45px;
+  bottom: 17.5%;
+  z-index: 100000;
+}
+.clean {
+  position: fixed;
+  right: 45px;
+  bottom: 12%;
   z-index: 100000;
 }
 </style>
