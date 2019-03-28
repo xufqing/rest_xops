@@ -5,6 +5,7 @@ import { parseTime } from '@/utils/index'
 const user = {
   state: {
     token: getToken(),
+    id: '',
     name: '',
     email: '',
     avatar: '',
@@ -15,6 +16,9 @@ const user = {
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
+    },
+    SET_ID: (state, id) => {
+      state.id = id
     },
     SET_NAME: (state, name) => {
       state.name = name
@@ -54,11 +58,12 @@ const user = {
     GetInfo({ commit }) {
       return new Promise((resolve, reject) => {
         getInfo().then(res => {
+          commit('SET_ID', res.detail.id)
           commit('SET_ROLES', res.detail.roles)
           commit('SET_NAME', res.detail.username)
           commit('SET_AVATAR', res.detail.avatar)
           commit('SET_EMAIL', res.detail.email)
-          commit('SET_CREATE_TIME', parseTime(res.createTime))
+          commit('SET_CREATE_TIME', parseTime(res.detail.createTime))
           resolve(res)
         }).catch(error => {
           reject(error)

@@ -3,14 +3,14 @@
     <el-button size="mini" class="button" type="info" @click="dialog = true">修改</el-button>
     <el-dialog :visible.sync="dialog" :title="title" width="500px" @close="cancel">
       <el-form ref="form" :model="form" :rules="rules" size="small" label-width="88px">
-        <el-form-item label="旧密码" prop="oldPass">
-          <el-input v-model="form.oldPass" type="password" auto-complete="on" style="width: 370px;"/>
+        <el-form-item label="旧密码" prop="old_password">
+          <el-input v-model="form.old_password" type="password" auto-complete="on" style="width: 370px;"/>
         </el-form-item>
-        <el-form-item label="新密码" prop="newPass">
-          <el-input v-model="form.newPass" type="password" auto-complete="on" style="width: 370px;"/>
+        <el-form-item label="新密码" prop="new_password1">
+          <el-input v-model="form.new_password1" type="password" auto-complete="on" style="width: 370px;"/>
         </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPass">
-          <el-input v-model="form.confirmPass" type="password" auto-complete="on" style="width: 370px;"/>
+        <el-form-item label="确认密码" prop="new_password2">
+          <el-input v-model="form.new_password2" type="password" auto-complete="on" style="width: 370px;"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -23,37 +23,33 @@
 
 <script>
 import store from '@/store'
-import { md5 } from '@/utils/md5'
-import { validPass, updatePass } from '@/api/user'
+import { updatePasswd } from '@/api/user'
 export default {
-  data() {
-    const validatePass = (rule, value, callback) => {
-      validPass(md5(value)).then(res => {
-        if (res.status === 200) {
-          callback()
-        } else {
-          callback(new Error('旧密码错误，请检查'))
-        }
-      })
+  props: {
+    id: {
+      type: Number,
+      required: true
     }
+  },
+  data() {
     const confirmPass = (rule, value, callback) => {
-      if (this.form.newPass !== value) {
+      if (this.form.new_password1 !== value) {
         callback(new Error('两次输入的密码不一致'))
       } else {
         callback()
       }
     }
     return {
-      loading: false, dialog: false, title: '修改密码', form: { oldPass: '', newPass: '', confirmPass: '' },
+      loading: false, dialog: false, title: '修改密码', form: { old_password: '', new_password1: '', new_password2: '' },
       rules: {
-        oldPass: [
-          { required: true, validator: validatePass, trigger: 'blur' }
+        old_password: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
         ],
-        newPass: [
+        new_password1: [
           { required: true, message: '请输入新密码', trigger: 'blur' },
           { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
         ],
-        confirmPass: [
+        new_password2: [
           { required: true, validator: confirmPass, trigger: 'blur' }
         ]
       }
@@ -67,12 +63,13 @@ export default {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           this.loading = true
-          updatePass(md5(this.form.confirmPass)).then(res => {
+          updatePasswd(this.id, this.form).then(res => {
             this.resetForm()
-            this.$notify({
-              title: '密码修改成功，请重新登录',
+            this.$message({
+              showClose: true,
               type: 'success',
-              duration: 1500
+              message: '密码修改成功!请重新登录!',
+              duration: 2500
             })
             setTimeout(() => {
               store.dispatch('LogOut').then(() => {
@@ -91,7 +88,7 @@ export default {
     resetForm() {
       this.dialog = false
       this.$refs['form'].resetFields()
-      this.form = { oldPass: '', newPass: '', confirmPass: '' }
+      this.form = { old_password: '', new_password1: '', new_password2: '' }
     }
   }
 }

@@ -8,7 +8,7 @@
             :on-success="handleSuccess"
             :on-error="handleError"
             :headers="headers"
-            :action="updateAvatarApi"
+            action=""
             class="avatar-uploader">
             <img v-if="avatar" :src="avatar" title="点击上传头像" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"/>
@@ -20,14 +20,13 @@
           <div>账号状态：<span style="color: #909399">正常</span></div>
         </div>
       </el-card>
-
       <el-card shadow="never" class="box-card reset-pass">
         <h4 class="account-label-icon">登录密码：</h4>
-        <updatePass/>
+        <updatePass :id="id"/>
         <p>安全性高的密码可使账号更安全，建议设置同时包含字母，数字，符号的密码。</p>
       </el-card>
 
-      <el-card shadow="never" class="box-card reset-email">
+      <!-- <el-card shadow="never" class="box-card reset-email">
         <h4 class="account-label-icon">邮箱验证：</h4>
         <updateEmail :email="email"/>
         <p>你的邮箱：{{ formatEmail(email) }} </p>
@@ -36,21 +35,19 @@
           <li>安全管理，密码重置与修改</li>
           <li>账号使用，使用邮箱登录系统</li>
         </ul>
-      </el-card>
+      </el-card> -->
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { regEmail } from '@/utils/index'
 import updatePass from './center/updatePass'
-import updateEmail from './center/updateEmail'
 import { getToken } from '@/utils/auth'
 import store from '@/store'
 export default {
   name: 'Center',
-  components: { updatePass, updateEmail },
+  components: { updatePass },
   data() {
     return {
       headers: {
@@ -60,17 +57,14 @@ export default {
   },
   computed: {
     ...mapGetters([
+      'id',
       'avatar',
       'name',
       'email',
-      'createTime',
-      'updateAvatarApi'
+      'createTime'
     ])
   },
   methods: {
-    formatEmail(mail) {
-      return regEmail(mail)
-    },
     handleSuccess(response, file, fileList) {
       this.$notify({
         title: '头像修改成功',

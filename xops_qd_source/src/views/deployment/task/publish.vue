@@ -147,7 +147,7 @@ export default {
             this.formloading = false
             this.$router.push({
               path: '/deploy/tasks/console',
-              query: { id: this.$route.query.id, alias: this.form.alias, record: res.record_id, scenario: 0 }
+              query: { id: this.$route.query.id, alias: this.form.alias, record: res.detail, scenario: 0 }
             })
           }).catch(err => {
             this.formloading = false
@@ -186,7 +186,7 @@ export default {
           this.rollbackloading = false
           this.$router.push({
             path: '/deploy/tasks/console',
-            query: { id: this.$route.query.id, alias: alias, record: res.record_id, scenario: 1 }
+            query: { id: this.$route.query.id, alias: alias, record: res.detail, scenario: 1 }
           })
         }).catch(err => {
           console.log(err)
@@ -216,7 +216,7 @@ export default {
         getVers(id).then(res => {
           this.vers = []
           const _this = this
-          res.forEach(function(data, index) {
+          res.detail.forEach(function(data, index) {
             _this.vers.push({
               id: index,
               value: data

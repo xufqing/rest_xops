@@ -60,10 +60,12 @@ class UserInfoView(APIView):
         if request.user.id is not None:
             perms = self.get_permission_from_role(request)
             data = {
-                'username': request._user.username,
-                'avatar': request._request._current_scheme_host + '/media/' + str(request._user.image),
-                'email': request._user.email,
-                'is_active': request._user.is_active,
+                'id': request.user.id,
+                'username': request.user.username,
+                'avatar': request._request._current_scheme_host + '/media/' + str(request.user.image),
+                'email': request.user.email,
+                'is_active': request.user.is_active,
+                'createTime':request.user.date_joined,
                 'roles': perms
             }
             return XopsResponse(data, status=OK)
@@ -318,11 +320,11 @@ class UserViewSet(ModelViewSet):
     def set_password(self, request, pk=None):
         user = UserProfile.objects.get(id=pk)
         old_password = request.data['old_password']
-        if check_password(old_password,user.password):
+        if check_password(old_password, user.password):
             new_password1 = request.data['new_password1']
             new_password2 = request.data['new_password2']
             if new_password1 == new_password2:
-                user.set_password(new_password1)
+                user.set_password(new_password2)
                 user.save()
                 return XopsResponse('密码修改成功!')
             else:

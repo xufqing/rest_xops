@@ -3,7 +3,8 @@
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework.response import Response
+from rest_xops.code import *
+from rest_xops.basic import XopsResponse
 from ..models import Project, DeployRecord
 from cmdb.models import DeviceInfo, ConnectionInfo
 from utils.shell_excu import Shell,auth_init
@@ -69,7 +70,7 @@ class VersionView(APIView):
             branches = result.stdout.split('\n')
             result = [branch.strip().lstrip('origin/') for branch in branches if
                       not branch.strip().startswith('origin/HEAD')]
-        return Response(result)
+        return XopsResponse(filter(None, result))
 
 
 class DeployView(APIView):
@@ -170,19 +171,14 @@ class DeployView(APIView):
             if result.exited == 0:
                 Project.objects.filter(id=id).update(status='Succeed')
                 info_logger.info('初始化项目:' + str(id) + ',执行成功!')
-                http_status = status.HTTP_200_OK
-                request_status = {
-                    'code': 200,
-                    'detail': '初始化成功!'
-                }
+                http_status = OK
+                msg = '初始化成功!'
             else:
                 error_logger.error('初始化项目:%s 执行失败! 错误信息:%s' % (str(id), result.stderr))
-                http_status = status.HTTP_400_BAD_REQUEST
-                request_status = {
-                    'code': 400,
-                    'detail': '初始化项目:%s 执行失败! 错误信息:%s' % (str(id), result.stderr)
-                }
-            return Response(request_status, status=http_status)
+                http_status = BAD
+                msg ='初始化项目:%s 执行失败! 错误信息:%s' % (str(id), result.stderr)
+
+            return XopsResponse(msg, status=http_status)
 
         elif request.data['excu'] == 'deploy':
             # 部署操作
@@ -200,7 +196,7 @@ class DeployView(APIView):
             serverid = request.data['server_ids']
             deploy = DeployExcu(webuser,record_id,id)
             deploy.start(log,version,serverid,record_id,webuser)
-            return Response({'record_id': record_id})
+            return XopsResponse(record_id)
 
         elif request.data['excu'] == 'rollback':
             # 回滚
@@ -211,7 +207,7 @@ class DeployView(APIView):
             record_id = str(alias) + '_' + str(self.start_time)
             log = self._path.rstrip('/') + '/' + str(project_id) + '_' + str(alias) + '/logs/' + record_id + '.log'
             self.do_rollback(id, log, record_id)
-            return Response({'record_id': record_id})
+            return XopsResponse(record_id)
 
         elif request.data['excu'] == 'deploymsg':
             # 部署控制台消息读取
@@ -227,18 +223,12 @@ class DeployView(APIView):
                     msg.local_tail(logfile, webuser)
                 else:
                     msg.read_file(logfile, webuser)
-                http_status = status.HTTP_200_OK
-                request_status = {
-                    'code': 200,
-                    'detail': '执行成功!'
-                }
+                http_status = OK
+                request_status = '执行成功!'
             except Exception:
-                http_status = status.HTTP_400_BAD_REQUEST
-                request_status = {
-                    'code': 400,
-                    'detail': '执行错误:文件不存在!'
-                }
-            return Response(request_status, status=http_status)
+                http_status = BAD
+                request_status ='执行错误:文件不存在!'
+            return XopsResponse(request_status, status=http_status)
 
         elif request.data['excu'] == 'app_start':
             # 项目启动
@@ -252,18 +242,12 @@ class DeployView(APIView):
                 commands = 'sh %s' % (app_start)
                 connect.run(commands, ws=True, webuser=webuser)
                 connect.close()
-                http_status = status.HTTP_200_OK
-                request_status = {
-                    'code': 200,
-                    'detail': '执行成功!'
-                }
+                http_status = OK
+                request_status = '执行成功!'
             except Exception as e:
-                http_status = status.HTTP_400_BAD_REQUEST
-                request_status = {
-                    'code': 400,
-                    'detail': '执行错误:' + str(e)
-                }
-            return Response(request_status, status=http_status)
+                http_status = BAD
+                request_status = '执行错误:' + str(e)
+            return XopsResponse(request_status, status=http_status)
 
         elif request.data['excu'] == 'app_stop':
             # 项目停止
@@ -277,18 +261,12 @@ class DeployView(APIView):
                 commands = 'sh %s' % (app_stop)
                 connect.run(commands, ws=True, webuser=webuser)
                 connect.close()
-                http_status = status.HTTP_200_OK
-                request_status = {
-                    'code': 200,
-                    'detail': '执行成功!'
-                }
+                http_status = OK
+                request_status = '执行成功!'
             except Exception as e:
-                http_status = status.HTTP_400_BAD_REQUEST
-                request_status = {
-                    'code': 400,
-                    'detail': '执行错误:' + str(e)
-                }
-            return Response(request_status, status=http_status)
+                http_status = BAD
+                request_status = '执行错误:' + str(e)
+            return XopsResponse(request_status, status=http_status)
 
         elif request.data['excu'] == 'tail_start':
             # 日志监控
@@ -306,18 +284,12 @@ class DeployView(APIView):
                 port = connect_info[0]['port']
                 tail = Tailf()
                 tail.remote_tail(host, port, user, passwd, app_log_file, webuser, filter_text=filter_text)
-                http_status = status.HTTP_200_OK
-                request_status = {
-                    'code': 200,
-                    'detail': '执行成功!'
-                }
+                http_status = OK
+                request_status = '执行成功!'
             except Exception as e:
-                http_status = status.HTTP_400_BAD_REQUEST
-                request_status = {
-                    'code': 400,
-                    'detail': str(e)
-                }
-            return Response(request_status, status=http_status)
+                http_status = BAD
+                request_status = str(e)
+            return XopsResponse(request_status, status=http_status)
 
         elif request.data['excu'] == 'tail_stop':
             # 日志监控停止
@@ -328,16 +300,9 @@ class DeployView(APIView):
                     if tail_key in gl._global_dict.keys():
                         client = gl.get_value('tail_' + str(webuser))
                         client.close()
-                http_status = status.HTTP_200_OK
-                request_status = {
-                    'code': 200,
-                    'detail': '执行成功!'
-                }
+                http_status = OK
+                request_status = '执行成功!'
             except Exception as e:
-                print(e)
-                http_status = status.HTTP_400_BAD_REQUEST
-                request_status = {
-                    'code': 400,
-                    'detail': str(e)
-                }
-            return Response(request_status, status=http_status)
+                http_status = BAD
+                request_status = str(e)
+            return XopsResponse(request_status, status=http_status)

@@ -117,7 +117,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    #'EXCEPTION_HANDLER': 'apps.common.custom_exception_handler.notification_exception_handler',#自定义exception
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',#
