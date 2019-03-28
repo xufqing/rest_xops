@@ -41,10 +41,8 @@ class Tailf(object):
         except Exception as e:
             self.send_message(webuser, e)
 
-    def remote_tail(self, host, port, user, passwd, logfile, webuser, filter_text):
+    def remote_tail(self, host, port, user, passwd, logfile, webuser, filter_text=None):
         # 创建一个可跨文件的全局变量，控制停止
-        gl._init()
-        gl.set_value('tail_' + str(webuser), False)
         try:
             self.client = paramiko.SSHClient()
             self.client.load_system_host_keys()
@@ -54,12 +52,14 @@ class Tailf(object):
             interact.expect('.*#.*')
             logfile = logfile.strip().replace('&&', '').replace('||', '').replace('|', '')
             self.send_message(webuser, '[INFO][%s@%s]开始监控日志' % (user, host))
+            gl._init()
+            gl.set_value('tail_' + str(webuser), self.client)
             if filter_text:
                 filter_text_re = filter_text.strip().replace('&&', '').replace('||', '').replace('|', '')
                 interact.send('tail -f %s|grep --color=never %s' % (logfile, filter_text_re))
             else:
                 interact.send('tail -f %s' % (logfile))
-            interact.tail(output_callback=lambda m: self.send_message(webuser, m),stop_callback=lambda x: gl.get_value('tail_' + str(webuser)), timeout=600)
+            interact.tail(output_callback=lambda m: self.send_message(webuser, m))
         except Exception as e:
             self.send_message(webuser, e)
         finally:

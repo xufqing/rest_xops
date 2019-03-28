@@ -305,7 +305,7 @@ class DeployView(APIView):
                 passwd = connect_info[0]['password']
                 port = connect_info[0]['port']
                 tail = Tailf()
-                tail.remote_tail(host, port, user, passwd, app_log_file, webuser, filter_text)
+                tail.remote_tail(host, port, user, passwd, app_log_file, webuser, filter_text=filter_text)
                 http_status = status.HTTP_200_OK
                 request_status = {
                     'code': 200,
@@ -326,7 +326,8 @@ class DeployView(APIView):
                 if hasattr(gl, '_global_dict'):
                     tail_key = 'tail_' + str(webuser)
                     if tail_key in gl._global_dict.keys():
-                        gl.set_value(tail_key, True)
+                        client = gl.get_value('tail_' + str(webuser))
+                        client.close()
                 http_status = status.HTTP_200_OK
                 request_status = {
                     'code': 200,
