@@ -14,15 +14,15 @@
       <el-table-column prop="mobile" label="手机号码"/>
       <el-table-column prop="department.name" label="部门"/>
       <el-table-column prop="position" label="职位" width="100px"/>
-      <el-table-column prop="superior.name" label="上级主管" width="100px"/>
       <el-table-column label="状态" width="50px">
         <template slot-scope="scope">
           <span>{{ scope.row.is_active ? '激活':'锁定' }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150px" align="center">
+      <el-table-column label="操作" width="200px" align="center">
         <template slot-scope="scope">
           <edit v-if="checkPermission(['admin','user_all','user_edit'])" :data="scope.row" :roles="roles" :organizations="organizations" :sup_this="sup_this"/>
+          <updatePass v-if="checkPermission(['admin','user_all'])" :data="scope.row" :sup_this="sup_this"/>
           <el-popover
             v-if="checkPermission(['admin','user_all','user_delete'])"
             :ref="scope.row.id"
@@ -57,8 +57,9 @@ import { getOrganizationTree } from '@/api/organization'
 import { parseTime } from '@/utils/index'
 import eHeader from './module/header'
 import edit from './module/edit'
+import updatePass from './module/updatePass'
 export default {
-  components: { eHeader, edit },
+  components: { eHeader, edit, updatePass },
   mixins: [initData],
   data() {
     return {
