@@ -58,7 +58,6 @@ export default {
   },
   mounted: function() {
     this.initWebSocket()
-    this.start()
   },
   beforeDestroy: function() {
     this.vm.$disconnect()
@@ -78,25 +77,29 @@ export default {
       this.vm = new Vue()
       this.vm.$connect()
       console.log('---连接Websocket----')
-    },
-    start() {
       this.$socket.onopen = (data) => {
         if (data.target.readyState === 1) {
-          console.log('--------正在读取数据!--------')
+          console.log('--------等待数据!--------')
           this.$socket.onmessage = (data) => {
             const color_data = this.getColor(data.data)
             this.data.push(color_data)
           }
-          const file = this.$route.query.id + '_' + this.$route.query.alias + '/logs/' + this.$route.query.record + '.log'
-          const data = {
-            excu: 'deploymsg',
-            file: file,
-            scenario: this.$route.query.scenario
-          }
-          // 开始读取
-          DeployExcu(data)
         }
+        this.$nextTick(() => {
+          this.start()
+        })
       }
+    },
+    start() {
+      const data = {
+        excu: 'deploymsg',
+        id: this.$route.query.id,
+        alias: this.$route.query.alias,
+        record: this.$route.query.record,
+        scenario: this.$route.query.scenario
+      }
+      // 开始读取
+      DeployExcu(data)
     },
     closeTag() {
       this.$confirm('是否关闭页面并返回上一页?', '提示', {

@@ -258,9 +258,13 @@ class UserBuildMenuView(APIView):
                 tree_dict[item['id']] = children_menu
         return tree_dict
 
-    def get_all_menus(self):
-        tree_dict = self.get_all_menu_dict()
+    def get_all_menus(self, request):
+        perms = UserInfoView.get_permission_from_role(request)
         tree_data = []
+        if 'admin' in perms or request.user.is_superuser:
+            tree_dict = self.get_all_menu_dict()
+        else:
+            tree_dict = self.get_menu_from_role(request)
         for i in tree_dict:
             if tree_dict[i]['pid']:
                 pid = tree_dict[i]['pid']
@@ -274,25 +278,8 @@ class UserBuildMenuView(APIView):
         return tree_data
 
     def get(self, request):
-        menu_data = []
         if request.user.id is not None:
-            perms = UserInfoView.get_permission_from_role(request)
-            if 'admin' in perms or request.user.is_superuser:
-                menu_data = self.get_all_menus()
-            else:
-                menu_dict = self.get_menu_from_role(request)
-                for i in menu_dict:
-                    # 重构所有菜单，子菜单加入父菜单
-                    if menu_dict[i]['pid']:
-                        pid = menu_dict[i]['pid']
-                        parent_menu = menu_dict[pid]
-                        parent_menu['component'] = 'Layout'
-                        parent_menu.setdefault('redirect', 'noredirect')
-                        parent_menu.setdefault('alwaysShow', True)
-                        parent_menu.setdefault('children', []).append(menu_dict[i])
-                        parent_menu['children'] = sorted(parent_menu['children'], key=itemgetter('sort'))
-                    else:
-                        menu_data.append(menu_dict[i])
+            menu_data = self.get_all_menus(request)
             return Response(sorted(menu_data, key=itemgetter('sort')), status=status.HTTP_200_OK)
         else:
             return Response({

@@ -1,0 +1,1 @@
+[{"model": "rbac.role", "pk": 1, "fields": {"name": "\u7cfb\u7edf\u7ba1\u7406\u5458", "desc": "\u7cfb\u7edf\u9ed8\u8ba4\u7ba1\u7406\u5458", "permissions": [1], "menus": []}}, {"model": "rbac.role", "pk": 2, "fields": {"name": "\u5f00\u53d1\u5de5\u7a0b\u5e08", "desc": "", "permissions": [28, 33, 49, 53], "menus": [7, 9, 11, 15, 17, 18, 20, 21, 22, 23, 24]}}]

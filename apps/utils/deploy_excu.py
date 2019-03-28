@@ -2,7 +2,6 @@
 # @Author  : xufqing
 
 from deployment.models import Project, DeployRecord
-from cmdb.models import ConnectionInfo, DeviceInfo
 from utils.shell_excu import Shell, auth_init
 from utils.common import includes_format, excludes_format, async
 import utils.globalvar as gl
@@ -23,6 +22,7 @@ class DeployExcu(object):
             project = Project.objects.filter(id=int(id)).values()
             self.project_id = project[0]['id']
             self.alias = str(project[0]['alias'])
+            self.environment = str(project[0]['environment'])
             self.repo_url = str(project[0]['repo_url'])
             self.local_code_path = self._path + str(id) + '_' + str(project[0]['alias']) + '/' + str(
                 project[0]['alias'])
@@ -82,7 +82,10 @@ class DeployExcu(object):
             # 更新到指定 commit
             with self.localhost.cd(self.local_code_path):
                 self.result = self.localhost.local('git fetch --all', write=log)
-                command = 'git rev-parse %s' % (version)
+                if self.environment == 'tag':
+                    command = 'git rev-parse %s' % (version)
+                else:
+                    command = 'git rev-parse refs/remotes/origin/%s' % (version)
                 commit_id = self.localhost.local(command, write=log).stdout.strip()
                 command = 'git checkout -f %s' % (commit_id)
                 if self.result.exited == 0:
@@ -132,24 +135,23 @@ class DeployExcu(object):
             # 上传压缩包
             self.file = '%s/%s' % (self.local_project_path.rstrip('/'), self.release_version + '.tar.gz')
             if self.result.exited == 0:
-                connect.put(self.file, remote=self.target_releases, write=log)
+                self.result = connect.put(self.file, remote=self.target_releases, write=log)
 
             # 判断是否超过可存档的数量
             with connect.cd(self.target_releases):
                 command = 'ls -l |grep "^d"|wc -l'
-                if self.result.exited == 0:
+                if self.result.remote:
                     self.result = connect.run(command, write=log)
                 releases_num = int(self.result.stdout.strip())
                 if releases_num >= self.version_num:
-                    last_data = DeployRecord.objects.filter(project_id=self.project_id, name__contains='部署',
-                                                            status='Succeed',
-                                                            is_rollback=True).order_by('-id')[
-                                :self.version_num].values()
-                    last_record_id = last_data[self.version_num - 1]['record_id']
+                    command = "ls -t |sort -t '_' -k 2 |head -1"
+                    if self.result.exited == 0:
+                        self.result = connect.run(command, write=log)
+                    last_record_id = self.result.stdout.strip()
                     command = 'rm -rf %s/%s' % (self.target_releases, last_record_id)
                     if self.result.exited == 0:
                         self.result = connect.run(command, write=log)
-                        DeployRecord.objects.filter(id=last_data[self.version_num - 1]['id']).update(is_rollback=False)
+                        DeployRecord.objects.filter(record_id=last_record_id).update(is_rollback=False)
 
             # 解压并删除压缩源
             with connect.cd(self.target_releases):

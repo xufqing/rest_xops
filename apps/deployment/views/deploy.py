@@ -36,7 +36,6 @@ class DeployRecordViewSet(ReadOnlyModelViewSet):
     authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (RbacPermission,)
 
-
 class VersionView(APIView):
     perms_map = ({'*': 'admin'}, {'*': 'deploy_all'}, {'get': 'deploy_excu'})
     permission_classes = (RbacPermission,)
@@ -61,7 +60,7 @@ class VersionView(APIView):
         result = None
         id = request.query_params['id']
         repo = Project.objects.filter(id=int(id)).values('alias', 'repo_url', 'repo_mode')
-        path = self._path + str(id) + '_' + str(repo[0]['alias']) + '/' + repo[0]['alias']
+        path = self._path.rstrip('/') + '/' + str(id) + '_' + str(repo[0]['alias']) + '/' + repo[0]['alias']
         if repo[0]['repo_mode'] == 'tag':
             result = self.get_tag(path)
             result = result.stdout.split('\n')
@@ -85,7 +84,7 @@ class DeployView(APIView):
     def repo_init(self, id):
         if id:
             repo = Project.objects.filter(id=int(id)).values('alias', 'repo_url')
-            path = self._path + str(id) + '_' + str(repo[0]['alias'])
+            path = self._path.rstrip('/') + '/' + str(id) + '_' + str(repo[0]['alias'])
             if not os.path.exists(path): os.makedirs(path)
             if not os.path.exists(path + '/logs'): os.makedirs(path + '/logs')
             localhost = Shell('127.0.0.1')
@@ -189,12 +188,13 @@ class DeployView(APIView):
             # 部署操作
             id = request.data['id']
             webuser = request.user.username
+            alias = request.data['alias']
             self.start_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
-            record_id = str(request.data['alias']) + '_' + str(self.start_time)
+            record_id = str(alias) + '_' + str(self.start_time)
             name = '部署_' + record_id
-            DeployRecord.objects.create(name=name, status='Failed', project_id=int(id))
+            DeployRecord.objects.create(name=name, alias=alias ,status='Failed', project_id=int(id))
             Project.objects.filter(id=id).update(last_task_status='Failed')
-            local_log_path = self._path + str(id) + '_' + str(request.data['alias']) + '/logs'
+            local_log_path = self._path.rstrip('/') + '/' + str(id) + '_' + str(request.data['alias']) + '/logs'
             log = local_log_path + '/' + record_id + '.log'
             version = request.data['version'].strip()
             serverid = request.data['server_ids']
@@ -209,16 +209,18 @@ class DeployView(APIView):
             alias = request.data['alias']
             self.start_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
             record_id = str(alias) + '_' + str(self.start_time)
-            log = self._path + str(project_id) + '_' + str(alias) + '/logs/' + record_id + '.log'
+            log = self._path.rstrip('/') + '/' + str(project_id) + '_' + str(alias) + '/logs/' + record_id + '.log'
             self.do_rollback(id, log, record_id)
             return Response({'record_id': record_id})
 
         elif request.data['excu'] == 'deploymsg':
             # 部署控制台消息读取
             try:
-                file = request.data['file']
-                logfile = self._path + file
+                id = request.data['id']
+                alias = request.data['alias']
+                record = request.data['record']
                 scenario = int(request.data['scenario'])
+                logfile = self._path.rstrip('/') + '/' + str(id) + '_' + str(alias) + '/logs/' + record + '.log'
                 webuser = request.user.username
                 msg = Tailf()
                 if scenario == 0:
@@ -291,6 +293,7 @@ class DeployView(APIView):
         elif request.data['excu'] == 'tail_start':
             # 日志监控
             try:
+                filter_text = str(request.data['filter'])
                 app_log_file = request.data['app_log_file']
                 host = request.data['host']
                 webuser = request.user.username
@@ -302,14 +305,13 @@ class DeployView(APIView):
                 passwd = connect_info[0]['password']
                 port = connect_info[0]['port']
                 tail = Tailf()
-                tail.remote_tail(host, port, user, passwd, app_log_file, webuser)
+                tail.remote_tail(host, port, user, passwd, app_log_file, webuser, filter_text=filter_text)
                 http_status = status.HTTP_200_OK
                 request_status = {
                     'code': 200,
                     'detail': '执行成功!'
                 }
             except Exception as e:
-                print(e)
                 http_status = status.HTTP_400_BAD_REQUEST
                 request_status = {
                     'code': 400,
@@ -324,7 +326,8 @@ class DeployView(APIView):
                 if hasattr(gl, '_global_dict'):
                     tail_key = 'tail_' + str(webuser)
                     if tail_key in gl._global_dict.keys():
-                        gl.set_value(tail_key, True)
+                        client = gl.get_value('tail_' + str(webuser))
+                        client.close()
                 http_status = status.HTTP_200_OK
                 request_status = {
                     'code': 200,

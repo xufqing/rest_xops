@@ -31,7 +31,8 @@ class ConsoleMsgConsumer(AsyncWebsocketConsumer):
             if deploy_key in gl._global_dict.keys():
                 gl.set_value(deploy_key, True)
             elif tail_key in gl._global_dict.keys():
-                gl.set_value(tail_key, True)
+                client = gl.get_value(tail_key)
+                client.close()
 
         await self.channel_layer.group_discard(
             webuser,
