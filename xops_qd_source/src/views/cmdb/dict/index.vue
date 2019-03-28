@@ -102,7 +102,7 @@ export default {
     },
     getDicts() {
       getDictTree().then(res => {
-        this.dicts = res
+        this.dicts = res.detail
       })
     }
   }

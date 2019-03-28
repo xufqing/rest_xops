@@ -233,7 +233,7 @@ export default {
     },
     getBusinesses() {
       getBusinessTree().then(res => {
-        this.businesstree = res
+        this.businesstree = res.detail
       })
     }
   }

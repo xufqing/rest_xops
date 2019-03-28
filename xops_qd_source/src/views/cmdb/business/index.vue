@@ -98,7 +98,7 @@ export default {
     },
     getBusinesses() {
       getBusinessTree().then(res => {
-        this.businesses = res
+        this.businesses = res.detail
       })
     }
   }

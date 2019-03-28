@@ -28,10 +28,10 @@ export default {
   methods: {
     to() {
       getMenuTree().then(res => {
-        this.menus = res
+        this.menus = res.detail
       })
       getPermissionTree().then(res => {
-        this.permissions = res
+        this.permissions = res.detail
       })
       const _this = this.$refs.form
       _this.permissionIds = []

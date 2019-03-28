@@ -75,7 +75,7 @@ export default {
           message: '初始化成功!',
           duration: 2500
         })
-        this.init()
+        this.sup_this.init()
       }).catch(err => {
         this.initLoading = false
         console.log(err)

@@ -61,7 +61,7 @@ export default {
       })
       _this.dialog = true
       getOrganizationUserTree().then(res => {
-        this.orgusers = res
+        this.orgusers = res.detail
       })
     }
   }

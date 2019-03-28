@@ -1,20 +1,23 @@
 # @Time    : 2019/1/12 21:03
 # @Author  : xufqing
 from ..models import UserProfile, Menu
+from django.contrib.auth.hashers import check_password
 from ..serializers.user_serializer import UserListSerializer, UserCreateSerializer, UserModifySerializer
 from ..serializers.menu_serializer import MenuSerializer
 from common.custom import CommonPagination, RbacPermission
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import action
 from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_xops.basic import XopsResponse
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from django.contrib.auth import authenticate
 from rest_framework_jwt.settings import api_settings
+from rest_framework.permissions import IsAuthenticated
 from rest_xops.settings import SECRET_KEY
-from rest_framework import status
 from operator import itemgetter
+from rest_xops.code import *
 import jwt
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -33,20 +36,15 @@ class UserAuthView(APIView):
         user = authenticate(username=username, password=password)
         if user:
             payload = jwt_payload_handler(user)
-            return Response({'token': jwt.encode(payload, SECRET_KEY)})
+            return XopsResponse({'token': jwt.encode(payload, SECRET_KEY)},status=OK)
         else:
-            return Response(
-                {'code': '400',
-                 'detail': '用户名或密码错误！'
-                 }, status=status.HTTP_400_BAD_REQUEST
-            )
+            return XopsResponse('用户名或密码错误!', status=BAD)
 
 
 class UserInfoView(APIView):
     '''
     获取当前用户信息和权限
     '''
-
     @classmethod
     def get_permission_from_role(self, request):
         try:
@@ -68,12 +66,9 @@ class UserInfoView(APIView):
                 'is_active': request._user.is_active,
                 'roles': perms
             }
-            return Response(data, status=status.HTTP_200_OK)
+            return XopsResponse(data, status=OK)
         else:
-            return Response({
-                'code': '403',
-                'detail': '请登录后访问'
-            }, status=status.HTTP_403_FORBIDDEN)
+            return XopsResponse('请登录后访问!', status=FORBIDDEN)
 
 class UserBuildMenuView(APIView):
     '''
@@ -280,12 +275,9 @@ class UserBuildMenuView(APIView):
     def get(self, request):
         if request.user.id is not None:
             menu_data = self.get_all_menus(request)
-            return Response(sorted(menu_data, key=itemgetter('sort')), status=status.HTTP_200_OK)
+            return XopsResponse(menu_data, status=OK)
         else:
-            return Response({
-                'code': '403',
-                'detail': '请登录后访问'
-            }, status=status.HTTP_403_FORBIDDEN)
+            return XopsResponse('请登录后访问!',status=FORBIDDEN)
 
 
 class UserViewSet(ModelViewSet):
@@ -319,4 +311,21 @@ class UserViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return XopsResponse(serializer.data, status=CREATED, headers=headers)
+
+    @action(methods=['post'], detail=True, permission_classes=[IsAuthenticated],
+            url_path='change-passwd', url_name='change-passwd')
+    def set_password(self, request, pk=None):
+        user = UserProfile.objects.get(id=pk)
+        old_password = request.data['old_password']
+        if check_password(old_password,user.password):
+            new_password1 = request.data['new_password1']
+            new_password2 = request.data['new_password2']
+            if new_password1 == new_password2:
+                user.set_password(new_password1)
+                user.save()
+                return XopsResponse('密码修改成功!')
+            else:
+                return XopsResponse('新密码两次输入不一致!', status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return XopsResponse('旧密码错误!', status=status.HTTP_400_BAD_REQUEST)

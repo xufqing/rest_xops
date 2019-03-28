@@ -106,7 +106,7 @@ export default {
     },
     getOrganizations() {
       getOrganizationTree().then(res => {
-        this.organizations = res
+        this.organizations = res.detail
       })
     },
     getRoleALL() {

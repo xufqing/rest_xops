@@ -21,7 +21,7 @@ router.beforeEach((to, from, next) => {
       if (store.getters.roles.length === 0) { // 判断当前用户是否已拉取完user_info信息
         store.dispatch('GetInfo').then(res => { // 拉取user_info
           buildMenus().then(res => {
-            const asyncRouter = filterAsyncRouter(res)
+            const asyncRouter = filterAsyncRouter(res.detail)
             asyncRouter.push({ path: '*', redirect: '/404', hidden: true })
             store.dispatch('GenerateRoutes', asyncRouter).then(() => { // 存储路由
               router.addRoutes(asyncRouter) // 动态添加可访问路由表

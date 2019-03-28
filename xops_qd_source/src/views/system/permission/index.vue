@@ -98,7 +98,7 @@ export default {
     },
     getPermissions() {
       getPermissionTree().then(res => {
-        this.permissions = res
+        this.permissions = res.detail
       })
     }
   }

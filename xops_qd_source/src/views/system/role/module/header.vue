@@ -47,12 +47,12 @@ export default {
     },
     getMenus() {
       getMenuTree().then(res => {
-        this.menus = res
+        this.menus = res.detail
       })
     },
     getPermissions() {
       getPermissionTree().then(res => {
-        this.permissions = res
+        this.permissions = res.detail
       })
     },
     download() {

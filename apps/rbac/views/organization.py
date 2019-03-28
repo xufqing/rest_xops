@@ -7,7 +7,7 @@ from common.custom import CommonPagination, RbacPermission, TreeAPIView
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_xops.basic import XopsResponse
 from rest_framework.permissions import IsAuthenticated
 
 
@@ -61,4 +61,4 @@ class OrganizationUserTreeView(APIView):
                 parent['children'].append(tree_dict[i])
             else:
                 tree_data.append(tree_dict[i])
-        return Response(tree_data)
+        return XopsResponse(tree_data)
