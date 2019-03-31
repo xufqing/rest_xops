@@ -2,7 +2,31 @@ demo地址: http://demo.xufqing.cn
 
 管理员账号:admin 密码admin@1234
 
-主要更新地址：[https://github.com/xufqing/rest_xops](https://github.com/xufqing/rest_xops)
+![1.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/1.png)
+
+![2.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/2.png)
+
+![3.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/3.png)
+
+![4.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/4.png)
+
+***特色功能开发进度***
+
+- 已完成
+- [X] 基于RBAC的用户权限管理
+- [X] 资产扫描功能（目前只能扫描linux服务器）
+- [X] 持续构建（websocket实时显示过程）
+- [X] 项目应用控制（启动停止）
+- [X] 应用日志的实时查看（websocket）
+- [X] 对象级权限控制（密码管理功能，只能查看编辑自己的密码）
+- 待开发
+- [ ] 工单系统
+- [ ] 作业平台（ansible api）
+- [ ] 应用日志下载
+- [ ] 文件管理
+- [ ] WEBSSH（堡垒机）
+- [ ] SQL作业平台
+- ...........
 
 ***本项目采用以下技术***
 
@@ -78,56 +102,91 @@ pyenv local rest_xops
 ```
 pip install -r requirements.txt
 ```
+3、修改配置
+```
+vi rest_xops/settings.py 
+# 修改数据库
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'rest_xops',
+        'HOST': '127.0.0.1',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'PORT': '3306',
+        'OPTIONS': { 'init_command': 'SET storage_engine=INNODB;' }
+    }
+}
+# 修改redis
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
-3、登陆MYSQL，创建数据库
+#修改redis
+vi rest_xops/celery.py
+
+BROKER_URL = 'redis://localhost:6379/1' # Broker配置，使用Redis作为消息中间件
+
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/1' # Backend设置，使用redis作为后端结果存储
+
+
+```
+
+
+4、登陆MYSQL，创建数据库
 
 ```
 CREATE DATABASE rest_xops DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 ```
 
-<!--4、执行创建表信息-->
+5、执行创建表信息
 
-<!--python manage.py makemigrations rbac-->
+python manage.py makemigrations rbac
 
-<!--python manage.py makemigrations cmdb-->
+python manage.py makemigrations cmdb
 
-<!--python manage.py makemigrations deployment-->
+python manage.py makemigrations deployment
 
-<!--python manage.py migrate-->
+python manage.py migrate
 
-<!--如果遇到mysql模块的问题-->
+**导入初始化数据**
 
-<!--ImportError: libmysqlclient.so.18: cannot open shared object file: No such file or directory-->
+python manage.py loaddata init_data/*.json
 
-<!--则：-->
+如果遇到mysql模块的问题
 
-<!--ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib64/libmysqlclient.so.18-->
+ImportError: libmysqlclient.so.18: cannot open shared object file: No such file or directory
 
-4、MYSQL导入初始化数据
+则：
 
-    mysql> use rest_xops;
-
-    source /home/xufeng/rest_xops/InitScripts/rest_xops.sql;
+ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib64/libmysqlclient.so.18
 
 
-5、修改管理员密码（必须操作）
 
+6、修改管理员密码（必须操作）
+    
     python manage.py changepassword admin
+    
 
-6、安装扫描工具
+7、安装扫描工具
 
     yum -y install nmap
 
-7、安装进程管理
+8、安装进程管理
 
     yum -y install supervisor
 
 
-8、开机启动
+9、开机启动
 
     systemctl enable supervisord
     systemctl start supervisord
-9、配置supervisor来管理celery
+10、配置supervisor来管理celery
 
 - celery_worker
 ```
@@ -137,8 +196,8 @@ vim /etc/supervisord.d/celery_worker.ini
 command=/home/xufeng/.pyenv/versions/rest_xops/bin/celery worker -A rest_xops -l INFO
 directory=/home/xufeng/rest_xops
 environment=PATH="/home/xufeng/.pyenv/versions/rest_xops/bin/"
-stdout_logfile=/home/xufeng/rest_xops/logs/worker_celery.log
-stderr_logfile=/home/xufeng/rest_xops/logs/worker_celery.log
+stdout_logfile=/run/rest_xops/worker_celery.log
+stderr_logfile=/run/rest_xops/worker_celery.log
 autostart=true
 autorestart=true
 priority=901
@@ -147,8 +206,8 @@ priority=901
 command=/home/xufeng/.pyenv/versions/rest_xops/bin/celery flower --broker=redis://localhost:6379/1
 directory=/home/xufeng/rest_xops
 environment=PATH="/home/xufeng/.pyenv/versions/rest_xops/"
-stdout_logfile=/home/xufeng/rest_xops/logs/flower_celery.log
-stderr_logfile=/home/xufeng/rest_xops/logs/flower_celery.log
+stdout_logfile=/run/rest_xops/flower_celery.log
+stderr_logfile=/run/rest_xops/flower_celery.log
 autostart=true
 autorestart=true
 priority=900
@@ -219,8 +278,8 @@ vim /etc/supervisord.d/xops_uwsgi.ini
 
 [program:xops]
 command=/home/xufeng/.pyenv/versions/rest_xops/bin/uwsgi /etc/xops_uwsgi.ini
-stdout_logfile=/home/xufeng/rest_xops/logs/xops_uwsgi.log
-stderr_logfile=/home/xufeng/rest_xops/logs/xops_uwsgi.log
+stdout_logfile=/run/rest_xops/uwsgi.log
+stderr_logfile=run/rest_xops/uwsgi.log
 stdout_logfile_maxbytes = 20MB
 autostart=true
 autorestart=true
@@ -238,8 +297,8 @@ numprocs=4
 process_name=asgi%(process_num)d
 autostart=true
 autorestart=true
-stdout_logfile=/home/xufeng/rest_xops/logs/xops_asgi.log
-stderr_logfile=/home/xufeng/rest_xops/logs/xops_asgi.log
+stdout_logfile=/run/rest_xops/asgi.log
+stderr_logfile=/run/rest_xops/asgi.log
 stdout_logfile_maxbytes = 20MB
 ```
 
