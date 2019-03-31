@@ -19,5 +19,6 @@ urlpatterns = [
     path(r'api/organization/tree/', organization.OrganizationTreeView.as_view(),name='organizations_tree'),
     path(r'api/organization/user/tree/', organization.OrganizationUserTreeView.as_view(), name='organization_user_tree'),
     path(r'api/menu/tree/', menu.MenuTreeView.as_view(), name='menus_tree'),
-    path(r'api/permission/tree/', permission.PermissionTreeView.as_view(), name='permissions_tree')
+    path(r'api/permission/tree/', permission.PermissionTreeView.as_view(), name='permissions_tree'),
+    path(r'api/user/list/', user.UserListView.as_view(), name='user_list'),
 ]

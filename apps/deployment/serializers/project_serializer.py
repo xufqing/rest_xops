@@ -17,7 +17,7 @@ class ProjectListSerializer(serializers.ModelSerializer):
     '''
     class Meta:
         model = Project
-        fields = ('id', 'name', 'environment', 'status', 'alias', 'last_task_status', 'server_ids')
+        fields = ('id', 'name', 'environment', 'status', 'alias', 'last_task_status', 'server_ids', 'user_id')
 
 class DeployRecordSerializer(serializers.ModelSerializer):
     class Meta:

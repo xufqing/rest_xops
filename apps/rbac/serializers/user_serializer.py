@@ -63,3 +63,11 @@ class UserCreateSerializer(serializers.ModelSerializer):
         if UserProfile.objects.filter(mobile=mobile):
             raise serializers.ValidationError("手机号已经被注册")
         return mobile
+
+class UserInfoListSerializer(serializers.ModelSerializer):
+    '''
+    公共users
+    '''
+    class Meta:
+        model = UserProfile
+        fields = ('id','name','mobile','email','position')

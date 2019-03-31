@@ -45,9 +45,10 @@ class DeviceAbstract(models.Model):
 class ConnectionAbstract(models.Model):
     hostname = models.CharField(max_length=80, verbose_name='IP/域名')
     auth_type = models.CharField(max_length=30, default='',verbose_name='认证类型')
-    port = models.IntegerField(blank=True, null=True, verbose_name='端口')
+    port = models.IntegerField(blank=True, default=0, verbose_name='端口')
     username = models.CharField(max_length=50, blank=True, default='', verbose_name='用户名/key')
     password = models.CharField(max_length=80, blank=True, default='', verbose_name='密码')
+    user_id = models.CharField(max_length=100,default='0', verbose_name='关联用户id')
 
 
     class Meta:

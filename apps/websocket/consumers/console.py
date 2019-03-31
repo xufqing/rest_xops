@@ -2,10 +2,11 @@
 # @Author  : xufqing
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.db import close_old_connections
 import utils.globalvar as gl
 
 class ConsoleMsgConsumer(AsyncWebsocketConsumer):
-
+    close_old_connections() #关闭上次空闲的数据库连接
     async def connect(self):
         await self.channel_layer.group_add(
             self.scope['user'].username,
