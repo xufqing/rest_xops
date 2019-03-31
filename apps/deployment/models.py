@@ -29,6 +29,7 @@ class Project(TimeAbstract):
     app_start = models.CharField(default='', max_length=100,blank=True, null=True, verbose_name='启动脚本')
     app_stop = models.CharField(default='', max_length=100, blank=True, null=True, verbose_name='停止脚本')
     app_log_file = models.CharField(default='', max_length=150,blank=True, null=True,  verbose_name='日志文件')
+    user_id = models.CharField(max_length=100, default='', blank=True, null=True, verbose_name='关联用户id')
 
     class Meta:
         verbose_name = '项目配置'

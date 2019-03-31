@@ -2,8 +2,9 @@
 # @Author  : xufqing
 from ..models import UserProfile, Menu
 from django.contrib.auth.hashers import check_password
-from ..serializers.user_serializer import UserListSerializer, UserCreateSerializer, UserModifySerializer
+from ..serializers.user_serializer import UserListSerializer, UserCreateSerializer, UserModifySerializer, UserInfoListSerializer
 from ..serializers.menu_serializer import MenuSerializer
+from rest_framework.generics import ListAPIView
 from common.custom import CommonPagination, RbacPermission
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
@@ -342,3 +343,12 @@ class UserViewSet(ModelViewSet):
                     return XopsResponse('新密码两次输入不一致!', status=status.HTTP_400_BAD_REQUEST)
             else:
                 return XopsResponse('旧密码错误!', status=status.HTTP_400_BAD_REQUEST)
+
+class UserListView(ListAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserInfoListSerializer
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filter_fields = ('name',)
+    ordering_fields = ('id',)
+    authentication_classes = (JSONWebTokenAuthentication,)
+    permission_classes = (IsAuthenticated,)

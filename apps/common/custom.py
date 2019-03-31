@@ -5,10 +5,10 @@ from rest_framework.permissions import BasePermission
 from rest_framework import serializers
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from rest_xops.basic import XopsResponse
 from rest_framework.generics import ListAPIView
 from errno import errorcode
+from rest_framework import permissions
 import celery
 
 class CommonPagination(PageNumberPagination):
@@ -23,7 +23,7 @@ class RbacPermission(BasePermission):
     '''
     自定义权限
     '''
-
+    @classmethod
     def get_permission_from_role(self, request):
         try:
             perms = request.user.roles.values(
@@ -48,6 +48,17 @@ class RbacPermission(BasePermission):
                         if (_method == method or method == '*') and alias in perms:
                             return True
 
+class ObjPermission(BasePermission):
+    '''
+    对象级权限控制
+    '''
+    def has_object_permission(self, request, view, obj):
+        perms = RbacPermission.get_permission_from_role(request)
+        uid = obj.user_id.split(',')
+        if 'admin' in perms:
+            return True
+        elif str(request.user.id) in uid:
+            return True
 
 class TreeSerializer(serializers.Serializer):
     id = serializers.IntegerField()

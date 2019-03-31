@@ -1,13 +1,15 @@
 <template>
   <div v-if="!item.hidden&&item.children" class="menu-wrapper">
     <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
+      <div style="background-color: #212529;">
+        <img :src="logo" style="height:50px;"/>
+      </div>
       <app-link :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
           <item v-if="onlyOneChild.meta" :icon="onlyOneChild.meta.icon||item.meta.icon" :title="onlyOneChild.meta.title" />
         </el-menu-item>
       </app-link>
     </template>
-
     <el-submenu v-else ref="submenu" :index="resolvePath(item.path)">
       <template slot="title">
         <item v-if="item.meta" :icon="item.meta.icon" :title="item.meta.title" />
@@ -29,11 +31,11 @@
         </app-link>
       </template>
     </el-submenu>
-
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import path from 'path'
 import { isExternal } from '@/utils'
 import Item from './Item'
@@ -61,8 +63,17 @@ export default {
   },
   data() {
     return {
-      onlyOneChild: null
+      onlyOneChild: null,
+      logo: ''
     }
+  },
+  computed: {
+    ...mapGetters([
+      'sidebar'
+    ])
+  },
+  mounted: function() {
+    this.initLogo()
   },
   methods: {
     hasOneShowingChild(children, parent) {
@@ -97,6 +108,13 @@ export default {
     },
     isExternalLink(routePath) {
       return isExternal(routePath)
+    },
+    initLogo() {
+      if (this.sidebar.opened) {
+        this.logo = require('../../../../assets/logo/logo1.png')
+      } else {
+        this.logo = require('../../../../assets/logo/logo2.png')
+      }
     }
   }
 }

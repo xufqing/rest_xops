@@ -2,10 +2,12 @@
 # @Author  : xufqing
 from rest_framework.viewsets import ModelViewSet
 from ..serializers.connection_serializer import ConnectionInfoSerializer
-from common.custom import CommonPagination, RbacPermission
+from common.custom import CommonPagination, RbacPermission, ObjPermission
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from ..models import ConnectionInfo
+from rest_xops.basic import XopsResponse
+from rest_xops.code import *
 
 class ConnectionInfoViewSet(ModelViewSet):
     '''
@@ -20,4 +22,23 @@ class ConnectionInfoViewSet(ModelViewSet):
     search_fields = ('hostname',)
     ordering_fields = ('id',)
     authentication_classes = (JSONWebTokenAuthentication,)
-    permission_classes = (RbacPermission,)
+    permission_classes = (RbacPermission,ObjPermission)
+
+    def create(self, request, *args, **kwargs):
+        # 创建密码时自动绑定uid
+        request.data['user_id'] = str(request.user.id)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return XopsResponse(serializer.data, status=CREATED, headers=headers)
+
+    def get_queryset(self):
+        '''
+        当前用户只能看到自己创建的密码
+        '''
+        perms = RbacPermission.get_permission_from_role(self.request)
+        if 'admin' in perms:
+            return self.queryset.all()
+        else:
+            return self.queryset.filter(user_id=str(self.request.user.id))

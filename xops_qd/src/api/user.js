@@ -31,3 +31,17 @@ export function updatePasswd(id, data) {
   })
 }
 
+export function getUserList(name) {
+  if (name) {
+    return request({
+      url: 'api/user/list/?name=' + name,
+      method: 'get'
+    })
+  } else {
+    return request({
+      url: 'api/user/list/',
+      method: 'get'
+    })
+  }
+}
+

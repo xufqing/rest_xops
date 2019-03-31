@@ -15,6 +15,7 @@
           <div style="display: inline-block;margin: 0px 1px;">
             <el-button v-if="checkPermission(['admin','project_all','project_edit'])" :loading="initLoading" size="mini" type="success" @click="toInit(scope.row.id)">检查</el-button>
           </div>
+          <member v-if="checkPermission(['admin','project_all','project_edit'])" :data="scope.row" :sup_this="sup_this"/>
           <el-button v-if="checkPermission(['admin','project_all','project_list'])" size="mini" type="primary" @click="toDetail(scope.row.id)">详情</el-button>
           <el-popover
             v-if="checkPermission(['admin','project_all','project_delete'])"
@@ -42,10 +43,12 @@
 
 <script>
 import checkPermission from '@/utils/permission' // 权限判断函数
+import member from './member'
 import { del } from '@/api/project'
 import { DeployExcu } from '@/api/deploy'
 import { parseTime } from '@/utils/index'
 export default {
+  components: { member },
   props: {
     sup_this: {
       type: Object,
