@@ -126,22 +126,30 @@
       <p class="warn-content">工具配置</p>
       <el-card class="box-card">
         <el-row>
-          <el-col :span="9">
+          <el-col :span="12">
             <el-form-item>
-              <span class="x-info">项目启动脚本路径+文件名<i class="el-icon-info"></i></span>
+              <span class="x-info">启动脚本路径<i class="el-icon-info"></i></span>
               <el-input v-model="form.app_start" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
-          <el-col :span="9">
+          <el-col :span="12">
             <el-form-item>
-              <span class="x-info">项目停止脚本路径+文件名<i class="el-icon-info"></i></span>
+              <span class="x-info">停止脚本路径<i class="el-icon-info"></i></span>
               <el-input v-model="form.app_stop" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+        </el-row>
+        <el-row>
+          <el-col :span="12">
             <el-form-item>
-              <span class="x-info">项目日志文件路径<i class="el-icon-info"></i></span>
-              <el-input v-model="form.app_log_file" :readonly="is_Readonly" style="width: 200px;"/>
+              <span class="x-info">日志存放目录<i class="el-icon-info"></i></span>
+              <el-input v-model="form.app_log_path" :readonly="is_Readonly" style="width: 300px;"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item>
+              <span class="x-info">实时日志路径<i class="el-icon-info"></i></span>
+              <el-input v-model="form.app_log_file" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
         </el-row>

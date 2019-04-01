@@ -190,14 +190,16 @@ ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib64/libmysqlclient.so.18
 
 - celery_worker
 ```
+mkdir -p /var/log/rest_xops
+
 vim /etc/supervisord.d/celery_worker.ini
 
 [program:celery-worker]
 command=/home/xufeng/.pyenv/versions/rest_xops/bin/celery worker -A rest_xops -l INFO
 directory=/home/xufeng/rest_xops
 environment=PATH="/home/xufeng/.pyenv/versions/rest_xops/bin/"
-stdout_logfile=/run/rest_xops/worker_celery.log
-stderr_logfile=/run/rest_xops/worker_celery.log
+stdout_logfile=/var/log/rest_xops/worker_celery.log
+stderr_logfile=/var/log/rest_xops/worker_celery.log
 autostart=true
 autorestart=true
 priority=901
@@ -206,8 +208,8 @@ priority=901
 command=/home/xufeng/.pyenv/versions/rest_xops/bin/celery flower --broker=redis://localhost:6379/1
 directory=/home/xufeng/rest_xops
 environment=PATH="/home/xufeng/.pyenv/versions/rest_xops/"
-stdout_logfile=/run/rest_xops/flower_celery.log
-stderr_logfile=/run/rest_xops/flower_celery.log
+stdout_logfile=/var/log/rest_xops/flower_celery.log
+stderr_logfile=/var/log/rest_xops/flower_celery.log
 autostart=true
 autorestart=true
 priority=900
@@ -278,7 +280,7 @@ vim /etc/supervisord.d/xops_uwsgi.ini
 
 [program:xops]
 command=/home/xufeng/.pyenv/versions/rest_xops/bin/uwsgi /etc/xops_uwsgi.ini
-stdout_logfile=/run/rest_xops/uwsgi.log
+stdout_logfile=/var/log/rest_xops/uwsgi.log
 stderr_logfile=run/rest_xops/uwsgi.log
 stdout_logfile_maxbytes = 20MB
 autostart=true
@@ -297,8 +299,8 @@ numprocs=4
 process_name=asgi%(process_num)d
 autostart=true
 autorestart=true
-stdout_logfile=/run/rest_xops/asgi.log
-stderr_logfile=/run/rest_xops/asgi.log
+stdout_logfile=/var/log/rest_xops/asgi.log
+stderr_logfile=/var/log/rest_xops/asgi.log
 stdout_logfile_maxbytes = 20MB
 ```
 

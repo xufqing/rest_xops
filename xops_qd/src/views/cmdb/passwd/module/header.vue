@@ -79,7 +79,7 @@ export default {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
         const tHeader = ['ID', 'IP/URL', '认证类型', '用户名', '密码', '端口', '备注']
-        const filterVal = ['id', 'hostname', 'auth_type', 'username', 'password', 'port', 'desc']
+        const filterVal = ['id', 'hostname', 'auth_type', 'username', 'password', 'port', 'user_name', 'desc', 'is_public']
         const data = this.formatJson(filterVal, this.$parent.data)
         excel.export_json_to_excel({
           header: tHeader,
