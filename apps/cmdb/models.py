@@ -56,7 +56,7 @@ class ConnectionAbstract(models.Model):
 class ConnectionInfo(ConnectionAbstract, TimeAbstract):
     is_public = models.BooleanField(default=False, verbose_name="是否公开")
     desc = models.CharField(max_length=150, blank=True, null=True, verbose_name='备注')
-    uid = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='关联用户')
+    uid = models.ForeignKey(User, null=True, blank=True, default=1, on_delete=models.SET_NULL, verbose_name='关联用户')
 
     class Meta:
         verbose_name = '连接信息'
@@ -66,7 +66,7 @@ class DeviceScanInfo(DeviceAbstract, ConnectionAbstract, TimeAbstract):
     '''
     储存扫描成功后的设备信息临时表
     '''
-    error_message = models.CharField(max_length=80, blank=True, default='', verbose_name='错误信息')
+    error_message = models.CharField(max_length=150, blank=True, default='', verbose_name='错误信息')
 
     class Meta:
         verbose_name = '扫描信息'
