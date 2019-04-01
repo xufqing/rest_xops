@@ -15,7 +15,7 @@
       <el-table-column prop="username" label="用户名" width="100"/>
       <el-table-column prop="password" label="密码"/>
       <el-table-column prop="port" label="端口" width="80"/>
-      <el-table-column prop="desc" label="描述"/>
+      <el-table-column prop="uid_name" label="所有者"/>
       <el-table-column label="操作" width="150px" align="center">
         <template slot-scope="scope">
           <edit v-if="checkPermission(['admin','connection_all','connection_edit'])" :data="scope.row" :sup_this="sup_this" :service_types="service_types"/>

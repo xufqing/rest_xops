@@ -15,6 +15,10 @@
       <el-form-item label="密码/KEY" prop="password">
         <el-input v-model="form.password" style="width: 370px;"/>
       </el-form-item>
+      <el-form-item label="是否公开" prop="is_public">
+        <el-radio v-model="form.is_public" label="true">是</el-radio>
+        <el-radio v-model="form.is_public" label="false" >否</el-radio>
+      </el-form-item>
       <el-form-item label="端口" prop="port">
         <el-input v-model="form.port" style="width: 370px;"/>
       </el-form-item>
@@ -55,7 +59,8 @@ export default {
         auth_type: null,
         username: '',
         password: '',
-        port: '',
+        is_public: 'false',
+        port: 0,
         desc: ''
       },
       rules: {
@@ -70,6 +75,9 @@ export default {
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' }
+        ],
+        is_public: [
+          { required: true, message: '是否要公开该密码', trigger: 'blur' }
         ]
       }
     }
@@ -125,7 +133,7 @@ export default {
     resetForm() {
       this.dialog = false
       this.$refs['form'].resetFields()
-      this.form = { hostname: '', auth_type: null, username: '', password: '', port: '', desc: '' }
+      this.form = { hostname: '', auth_type: null, username: '', password: '', is_public: 'false', port: 0, desc: '' }
     }
   }
 }

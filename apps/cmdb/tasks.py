@@ -66,7 +66,7 @@ def scan_execution():
                     break
             connect.close()
             defaults = kwargs
-            kwargs['user_id'] = '0'
+            kwargs['uid'] = 1
             defaults.pop('commands')
             DeviceScanInfo.objects.update_or_create(
                 hostname=host['host'],

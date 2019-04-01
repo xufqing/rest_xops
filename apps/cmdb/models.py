@@ -48,14 +48,15 @@ class ConnectionAbstract(models.Model):
     port = models.IntegerField(blank=True, default=0, verbose_name='端口')
     username = models.CharField(max_length=50, blank=True, default='', verbose_name='用户名/key')
     password = models.CharField(max_length=80, blank=True, default='', verbose_name='密码')
-    user_id = models.CharField(max_length=100,default='0', verbose_name='关联用户id')
 
 
     class Meta:
         abstract = True
 
 class ConnectionInfo(ConnectionAbstract, TimeAbstract):
+    is_public = models.BooleanField(default=False, verbose_name="是否公开")
     desc = models.CharField(max_length=150, blank=True, null=True, verbose_name='备注')
+    uid = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, verbose_name='关联用户')
 
     class Meta:
         verbose_name = '连接信息'

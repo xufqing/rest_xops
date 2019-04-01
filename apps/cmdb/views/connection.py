@@ -8,6 +8,7 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from ..models import ConnectionInfo
 from rest_xops.basic import XopsResponse
 from rest_xops.code import *
+from django.db.models import Q
 
 class ConnectionInfoViewSet(ModelViewSet):
     '''
@@ -26,7 +27,7 @@ class ConnectionInfoViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         # 创建密码时自动绑定uid
-        request.data['user_id'] = str(request.user.id)
+        request.data['uid'] = request.user.id
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -35,10 +36,10 @@ class ConnectionInfoViewSet(ModelViewSet):
 
     def get_queryset(self):
         '''
-        当前用户只能看到自己创建的密码
+        当前用户只能看到自己创建和已公开的密码
         '''
         perms = RbacPermission.get_permission_from_role(self.request)
         if 'admin' in perms:
             return self.queryset.all()
         else:
-            return self.queryset.filter(user_id=str(self.request.user.id))
+            return self.queryset.filter(Q(uid_id=self.request.user.id) | Q(is_public=True))

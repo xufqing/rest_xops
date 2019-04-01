@@ -3,7 +3,7 @@
     <!--表格渲染-->
     <div style="display: inline-block;margin: 10px 10px;float: right">
       <el-button
-        v-if="checkPermission(['admin','connection_all','connection_create'])"
+        v-if="checkPermission(['admin','device_all','device_create'])"
         size="mini"
         type="primary"
         icon="el-icon-plus"

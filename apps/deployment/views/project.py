@@ -15,8 +15,9 @@ class ProjectViewSet(ModelViewSet):
     业务管理：增删改查
     '''
     perms_map = (
-    {'*': 'admin'}, {'*': 'project_all'}, {'get': 'project_list'}, {'post': 'project_create'}, {'put': 'project_edit'},
-    {'delete': 'project_delete'})
+        {'*': 'admin'}, {'*': 'project_all'}, {'get': 'project_list'}, {'post': 'project_create'},
+        {'put': 'project_edit'},
+        {'delete': 'project_delete'})
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     pagination_class = CommonPagination
@@ -25,7 +26,7 @@ class ProjectViewSet(ModelViewSet):
     search_fields = ('name',)
     ordering_fields = ('id',)
     authentication_classes = (JSONWebTokenAuthentication,)
-    permission_classes = (RbacPermission, ObjPermission)
+    permission_classes = (RbacPermission,)
 
     def get_serializer_class(self):
         # 根据请求类型动态变更serializer
@@ -38,10 +39,10 @@ class ProjectViewSet(ModelViewSet):
         只有项目组成员才能看到项目
         '''
         perms = RbacPermission.get_permission_from_role(self.request)
-        if 'admin' in perms:
+        if 'admin' in perms or 'project_all' in perms:
             return self.queryset.all()
         else:
             uid = str(self.request.user.id)
-            result = self.queryset.filter(user_id__icontains=uid).filter(
+            result = self.queryset.filter(
                 Q(user_id__icontains=uid + ',') | Q(user_id__in=uid) | Q(user_id__endswith=',' + uid))
         return result
