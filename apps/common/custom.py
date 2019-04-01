@@ -50,14 +50,13 @@ class RbacPermission(BasePermission):
 
 class ObjPermission(BasePermission):
     '''
-    对象级权限控制
+    密码管理对象级权限控制
     '''
     def has_object_permission(self, request, view, obj):
         perms = RbacPermission.get_permission_from_role(request)
-        uid = obj.user_id.split(',')
         if 'admin' in perms:
             return True
-        elif str(request.user.id) in uid:
+        elif request.user.id == obj.uid_id:
             return True
 
 class TreeSerializer(serializers.Serializer):

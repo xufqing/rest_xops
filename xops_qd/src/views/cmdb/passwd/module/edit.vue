@@ -31,6 +31,7 @@ export default {
         auth_type: this.data.auth_type,
         username: this.data.username,
         password: this.data.password,
+        is_public: this.data.is_public.toString(),
         port: this.data.port,
         desc: this.data.desc
       }
