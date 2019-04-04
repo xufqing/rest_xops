@@ -69,17 +69,21 @@ class AppLogView(APIView):
             file_path = request.data['file_path']
             host = request.data['host']
             file_name = os.path.basename(file_path)
-            new_file_name = os.path.splitext(file_name)[0] + '.tar.gz'
-            auth_info, auth_key = auth_init(host)
-            connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
-            commands = 'mkdir -p /tmp/remote/ && tar czf /tmp/remote/%s %s' % (new_file_name, file_path)
-            connect.run(commands)
-            connect.get('/tmp/remote/' + new_file_name ,'/tmp/' + new_file_name)
-            response = FileResponse(open('/tmp/' + new_file_name, 'rb'))
-            response['Content-Type'] = 'application/octet-stream'
-            response['Content-Disposition'] = 'attachment;filename="%s"' % new_file_name
-            commands = 'rm -f /tmp/remote/%s' % (new_file_name)
-            connect.run(commands)
-            connect.close()
-            os.remove('/tmp/' + new_file_name)
-            return response
+            old_file_name = os.path.splitext(file_name)
+            if old_file_name[1] == '.log':
+                new_file_name = old_file_name[0] + '.tar.gz'
+                auth_info, auth_key = auth_init(host)
+                connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+                commands = 'mkdir -p /tmp/remote/ && tar czf /tmp/remote/%s %s' % (new_file_name, file_path)
+                connect.run(commands)
+                connect.get('/tmp/remote/' + new_file_name ,'/tmp/' + new_file_name)
+                response = FileResponse(open('/tmp/' + new_file_name, 'rb'))
+                response['Content-Type'] = 'application/octet-stream'
+                response['Content-Disposition'] = 'attachment;filename="%s"' % new_file_name
+                commands = 'rm -f /tmp/remote/%s' % (new_file_name)
+                connect.run(commands)
+                connect.close()
+                os.remove('/tmp/' + new_file_name)
+                return response
+            else:
+                return XopsResponse('请求文件格式不对!',status=BAD)
