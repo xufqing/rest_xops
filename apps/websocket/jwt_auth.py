@@ -6,6 +6,7 @@ from django.conf import LazySettings
 from jwt import InvalidSignatureError, ExpiredSignatureError, DecodeError
 from urllib import parse
 from rbac.models import UserProfile
+from django.db import close_old_connections
 
 warn_logger = logging.getLogger('warn')
 settings = LazySettings()
@@ -15,6 +16,8 @@ class TokenAuthMiddleware:
         self.inner = inner
 
     def __call__(self, scope):
+        # Close old database connections to prevent usage of timed out connections
+        close_old_connections()
         try:
             query = parse.parse_qs(scope['query_string'].decode("utf-8"))['token'][0]
             if query:
