@@ -28,6 +28,7 @@ class Project(TimeAbstract):
     last_task_status = models.CharField(max_length=20, default='',null=True, blank=True, verbose_name="状态")
     app_start = models.CharField(default='', max_length=100,blank=True, null=True, verbose_name='启动脚本')
     app_stop = models.CharField(default='', max_length=100, blank=True, null=True, verbose_name='停止脚本')
+    app_log_path = models.CharField(default='', max_length=150, blank=True, null=True, verbose_name='日志目录')
     app_log_file = models.CharField(default='', max_length=150,blank=True, null=True,  verbose_name='日志文件')
     user_id = models.CharField(max_length=100, default='', blank=True, null=True, verbose_name='关联用户id')
 

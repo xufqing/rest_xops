@@ -84,7 +84,7 @@ export default {
     return {
       ico: 'unlock', unlock: true, content: '锁定滚动条',
       height: document.documentElement.clientHeight - 94.5 + 'px;',
-      width: document.documentElement.clientWidth - 185 + 'px;',
+      width: document.documentElement.clientWidth - 225 + 'px;',
       startloading: false,
       stoploading: false,
       tailloading: false,

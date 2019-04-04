@@ -21,3 +21,27 @@ export function getRecords(id) {
     method: 'get'
   })
 }
+
+export function ApplogExcu(data) {
+  return request({
+    url: 'api/deploy/applog/',
+    method: 'post',
+    data
+  })
+}
+
+// export function ApplogDown(sid, file) {
+//   return request({
+//     url: 'api/deploy/applog/?sid=' + sid + '&file=' + file,
+//     method: 'get'
+//   })
+// }
+export function ApplogDown(data) {
+  return request({
+    url: 'api/deploy/applog/',
+    method: 'post',
+    data,
+    responseType: 'blob'
+  })
+}
+
