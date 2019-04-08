@@ -4,7 +4,7 @@
     <el-table v-loading="sup_this.loading" :data="sup_this.data" size="small" border style="width: 100%;">
       <el-table-column prop="name" label="名称"/>
       <el-table-column prop="environment" label="环境" width="200"/>
-      <el-table-column label="状态" width="150">
+      <el-table-column label="初始化状态" width="150">
         <template slot-scope="scope">
           <span v-if="scope.row.status == 'Succeed'" style="color:#00CC00">成功</span>
           <span v-else style="color:red">失败</span>
