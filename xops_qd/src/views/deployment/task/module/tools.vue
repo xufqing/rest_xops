@@ -20,8 +20,8 @@
               </el-form-item>
               <el-form-item>
                 <div style="display: inline-block;margin: 0px 1px;">
-                  <el-button :loading="startloading" size="mini" type="primary" icon="el-icon-share" @click="doStart">启动应用</el-button>
-                  <el-button :loading="stoploading" size="mini" type="danger" icon="el-icon-plus" @click="doStop">停止应用</el-button>
+                  <el-button :loading="startloading" size="mini" type="primary" icon="el-icon-check" @click="doStart">启动应用</el-button>
+                  <el-button :loading="stoploading" size="mini" type="danger" icon="el-icon-close" @click="doStop">停止应用</el-button>
                 </div>
               </el-form-item>
             </el-form>
@@ -44,8 +44,8 @@
             </el-form-item>
             <el-form-item>
               <div style="display: inline-block;margin: 0px 1px;">
-                <el-button :loading="tailloading" size="mini" type="primary" icon="el-icon-share" @click="doTailStart">监控日志</el-button>
-                <el-button size="mini" type="danger" icon="el-icon-plus" @click="doTailStop">停止监控</el-button>
+                <el-button :loading="tailloading" size="mini" type="primary" icon="el-icon-check" @click="doTailStart">监控日志</el-button>
+                <el-button size="mini" type="danger" icon="el-icon-close" @click="doTailStop">停止监控</el-button>
               </div>
             </el-form-item>
           </el-form>

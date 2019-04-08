@@ -13,7 +13,7 @@
       <el-table-column label="操作" width="350px" align="center">
         <template slot-scope="scope">
           <div style="display: inline-block;margin: 0px 1px;">
-            <el-button v-if="checkPermission(['admin','deploy_all','deploy_excu'])" size="mini" type="success" icon="el-icon-share" @click="toPublish(scope.row.id)">发布</el-button>
+            <el-button v-if="checkPermission(['admin','deploy_all','deploy_excu'])" size="mini" type="success" icon="el-icon-caret-right" @click="toPublish(scope.row.id)">发布</el-button>
           </div>
           <div style="display: inline-block;margin: 0px 1px;">
             <el-button v-if="checkPermission(['admin','deploy_all','deploy_excu'])" size="mini" type="primary" icon="el-icon-plus" @click="toTools(scope.row.id)">工具</el-button>

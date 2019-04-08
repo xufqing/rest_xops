@@ -33,7 +33,6 @@ class UserAuthView(APIView):
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
-
         user = authenticate(username=username, password=password)
         if user:
             payload = jwt_payload_handler(user)

@@ -9,6 +9,6 @@ hosts:
     commands:
             sys_hostname: 'hostname'
             mac_address: 'cat /sys/class/net/[^tsbvl]*/address'
-            sn_number: 'dmidecode -s system-serial-number'
+            sn_number: 'hostname'
             os_version: 'cat /etc/redhat-release'
     auth_type: 'key_filename'

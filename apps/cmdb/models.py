@@ -66,7 +66,7 @@ class DeviceScanInfo(DeviceAbstract, ConnectionAbstract, TimeAbstract):
     '''
     储存扫描成功后的设备信息临时表
     '''
-    error_message = models.CharField(max_length=150, blank=True, default='', verbose_name='错误信息')
+    error_message = models.TextField(max_length=150, blank=True, default='', verbose_name='错误信息')
 
     class Meta:
         verbose_name = '扫描信息'
