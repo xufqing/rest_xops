@@ -82,7 +82,7 @@ export default {
         })
         _project_data.server_ids = _servers[0]
       })
-    }, 200)
+    }, 500)
   },
   methods: {
     parseTime,

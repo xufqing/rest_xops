@@ -194,7 +194,7 @@ class DeployView(APIView):
             version = request.data['version'].strip()
             serverid = request.data['server_ids']
             deploy = DeployExcu(webuser,record_id,id)
-            deploy.start(log,version,serverid,record_id,webuser)
+            deploy.start(log,version,serverid,record_id,webuser,self.start_time )
             return XopsResponse(record_id)
 
         elif request.data['excu'] == 'rollback':
@@ -239,7 +239,7 @@ class DeployView(APIView):
                 connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
                 app_start = app_start.strip().replace('&&', '').replace('||', '')
                 commands = '/bin/bash -e %s' % (app_start)
-                connect.run(commands, ws=True, webuser=webuser)
+                connect.run(commands, pty=True, ws=True, webuser=webuser)
                 connect.close()
                 http_status = OK
                 request_status = '执行成功!'
@@ -258,7 +258,7 @@ class DeployView(APIView):
                 connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
                 app_stop = app_stop.strip().replace('&&', '').replace('||', '')
                 commands = '/bin/bash -e %s' % (app_stop)
-                connect.run(commands, ws=True, webuser=webuser)
+                connect.run(commands, pty=True, ws=True, webuser=webuser)
                 connect.close()
                 http_status = OK
                 request_status = '执行成功!'

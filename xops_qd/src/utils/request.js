@@ -40,10 +40,17 @@ service.interceptors.response.use(
   response => {
     const code = response.status
     if (code < 200 || code > 300) {
-      Notification.error({
-        title: '错误',
-        message: response.detail
-      })
+      if (code === 502) {
+        Notification.error({
+          title: '错误',
+          message: '后端服务器连接失败!'
+        })
+      } else {
+        Notification.error({
+          title: '错误',
+          message: response.detail
+        })
+      }
       return Promise.reject('error')
     } else {
       return response.data

@@ -57,7 +57,6 @@ export default {
     getCookie() {
       const username = Cookies.get('username')
       const rememberMe = Cookies.get('rememberMe')
-      // 保存cookie里面的加密后的密码
       this.loginForm = {
         username: username === undefined ? '' : username,
         rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)

@@ -97,13 +97,13 @@
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">Deploy前置任务<i class="el-icon-info"></i></span>
+              <span class="x-info">Checkout前置任务<i class="el-icon-info"></i></span>
               <codemirror v-model="form.prev_deploy" :options="cmOptions" class="x-code"></codemirror>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">Deploy后置任务<i class="el-icon-info"></i></span>
+              <span class="x-info">Checkout后置任务<i class="el-icon-info"></i></span>
               <codemirror v-model="form.post_deploy" :options="cmOptions" class="x-code"></codemirror>
             </el-form-item>
           </el-col>
@@ -111,13 +111,13 @@
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">Release前置任务<i class="el-icon-info"></i></span>
+              <span class="x-info">Deploy前置任务<i class="el-icon-info"></i></span>
               <codemirror v-model="form.prev_release" :options="cmOptions" class="x-code"></codemirror>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">Release后置任务<i class="el-icon-info"></i></span>
+              <span class="x-info">Deploy后置任务<i class="el-icon-info"></i></span>
               <codemirror v-model="form.post_release" :options="cmOptions" class="x-code"></codemirror>
             </el-form-item>
           </el-col>

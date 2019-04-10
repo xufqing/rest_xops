@@ -7,6 +7,8 @@ from utils.common import includes_format, excludes_format, async
 import utils.globalvar as gl
 from utils.websocket_tail import Tailf
 from django.conf import settings
+import os
+
 
 class DeployExcu(object):
     _path = settings.WORKSPACE
@@ -15,6 +17,7 @@ class DeployExcu(object):
     prev_release_version = None
     result = None
     file = None
+    start_time = None
 
     def __init__(self, webuser, record_id, id=None):
         self.localhost = Shell('127.0.0.1')
@@ -41,7 +44,8 @@ class DeployExcu(object):
             self.custom_global_env = {
                 'WEB_ROOT': str(self.target_root),
                 'CODE_ROOT': str(self.local_code_path),
-                'ALIAS': str(self.alias)
+                'ALIAS': str(self.alias),
+                'START_TIME': str(self.start_time)
             }
             if project[0]['task_envs']:
                 task_envs = [i.strip() for i in project[0]['task_envs'].split('\n') if
@@ -90,6 +94,9 @@ class DeployExcu(object):
                 command = 'git checkout -f %s' % (commit_id)
                 if self.result.exited == 0:
                     self.result = self.localhost.local(command, write=log)
+                command = 'git show --stat'
+                if self.result.exited == 0:
+                    self.result = self.localhost.local(command, write=log)
 
     def do_post_deploy(self, log):
         '''
@@ -112,13 +119,24 @@ class DeployExcu(object):
             with self.localhost.cd(self.local_code_path):
                 if self.is_include:
                     files = includes_format(self.local_code_path, self.excludes)
-                    command = 'tar zcf %s/%s %s' % (
-                        self.local_project_path.rstrip('/'), self.release_version + '.tar.gz', files)
+                    for file in files:
+                        dirname = file[0]
+                        filename = '.' if file[1] == '*' else file[1]
+                        tar_name = self.local_project_path.rstrip('/') + '/' + self.release_version + '.tar'
+                        tar_params = 'tar rf' if os.path.exists(tar_name) else 'tar cf'
+                        if dirname:
+                            command = '%s %s -C %s %s' % (tar_params, tar_name, dirname, filename)
+                            if self.result.exited == 0:
+                                self.result = self.localhost.local(command, write=log)
+                        else:
+                            command = '%s %s %s' % (tar_params, tar_name, filename)
+                            if self.result.exited == 0:
+                                self.result = self.localhost.local(command, write=log)
                 else:
                     files = excludes_format(self.local_code_path, self.excludes)
-                    command = 'tar zcf ../%s %s' % (self.release_version + '.tar.gz', files)
-                if self.result.exited == 0:
-                    self.result = self.localhost.local(command, write=log)
+                    command = 'tar cf ../%s %s' % (self.release_version + '.tar', files)
+                    if self.result.exited == 0:
+                        self.result = self.localhost.local(command, write=log)
 
     def do_prev_release(self, log, connect):
         '''
@@ -133,10 +151,11 @@ class DeployExcu(object):
             if self.result.exited == 0:
                 self.result = connect.run(command, write=log)
             # 上传压缩包
-            self.file = '%s/%s' % (self.local_project_path.rstrip('/'), self.release_version + '.tar.gz')
+            self.file = '%s/%s' % (self.local_project_path.rstrip('/'), self.release_version + '.tar')
             if self.result.exited == 0:
+                with open(log, 'a') as f:
+                    f.write('[INFO]------正在上传压缩包至远程服务器------\n')
                 self.result = connect.put(self.file, remote=self.target_releases, write=log)
-
             # 判断是否超过可存档的数量
             with connect.cd(self.target_releases):
                 command = 'ls -l |grep "^d"|wc -l'
@@ -155,9 +174,10 @@ class DeployExcu(object):
 
             # 解压并删除压缩源
             with connect.cd(self.target_releases):
-                command = 'mkdir %s && tar zxf %s -C %s && rm -f %s' % \
-                          (self.release_version, self.release_version + '.tar.gz', self.release_version,
-                           self.release_version + '.tar.gz')
+                command = 'mkdir %s && mv %s %s && cd %s && tar xf %s && rm -f %s' % \
+                          (self.release_version, self.release_version + '.tar', self.release_version,
+                           self.release_version, self.release_version + '.tar',
+                           self.release_version + '.tar')
                 if self.result.exited == 0:
                     self.result = connect.run(command, write=log)
 
@@ -251,8 +271,10 @@ class DeployExcu(object):
             defaults['is_rollback'] = False
             DeployRecord.objects.filter(name=name).update(**defaults)
             Project.objects.filter(id=self.project_id).update(last_task_status='Failed')
+
     @async
-    def start(self, log, version, serverid, record_id, webuser):
+    def start(self, log, version, serverid, record_id, webuser, start_time):
+        self.start_time = start_time
         try:
             self.do_prev_deploy(log)
             self.do_checkout(version, log)

@@ -12,9 +12,9 @@ app.autodiscover_tasks() # 自动发现task，这个配置会自动从每个app�
 
 # 以下内容也可以写在settings.py文件中 
 
-BROKER_URL = 'redis://localhost:6379/1' # Broker配置，使用Redis作为消息中间件
+BROKER_URL = 'redis://localhost:16379/1' # Broker配置，使用Redis作为消息中间件
 
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/1' # Backend设置，使用redis作为后端结果存储
+CELERY_RESULT_BACKEND = 'redis://localhost:16379/1' # Backend设置，使用redis作为后端结果存储
 
 CELERY_TIMEZONE = 'Asia/Shanghai'
 

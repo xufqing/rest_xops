@@ -37,45 +37,29 @@ class Shell(Connection):
     def init_env(self, **kwargs):
         self.custom_global_env = kwargs['env']
 
-    def run(self, command, run_mode=run_mode_remote, write=None, pty=True, exception=True, ws=False, webuser=None, **kwargs):
+    def run(self, command, run_mode=run_mode_remote, write=None, pty=False, exception=True, ws=False, webuser=None, **kwargs):
         try:
             if run_mode == self.run_mode_local:
-                result = super(Shell, self).local(command, pty=pty, warn=True, watchers=[say_yes()],
+                result = super(Shell, self).local(command, pty=pty, echo_stdin=True, warn=True, watchers=[say_yes()],
                                                   env=self.custom_global_env, **kwargs)
             else:
-                result = super(Shell, self).run(command, pty=pty, warn=True, watchers=[say_yes()],
+                result = super(Shell, self).run(command, pty=pty, echo_stdin=True,warn=True, watchers=[say_yes()],
                                                 env=self.custom_global_env, **kwargs)
+            exited, stdout, stderr = result.exited, result.stdout, result.stderr
             if result.failed:
-                exited, stdout, stderr = result.exited, '', result.stdout
-                message = '[%s@%s]# %s\n[ERROR] %s' % (self.user, self.host, command, stderr)
-                if write:
-                    with open(write, 'a') as f:
-                        f.write(message)
-                elif ws and webuser:
-                    message_in = '[%s@%s]# %s' % (self.user, self.host, command)
-                    message_out = '[ERROR] %s' % (stderr)
-                    websocket = Tailf()
-                    websocket.send_message(webuser,message_in)
-                    websocket.send_message(webuser, message_out)
-                elif exception:
-                    raise Exception(stderr)
-            else:
-                exited, stdout, stderr = 0, result.stdout, ''
-                message = '[%s@%s]# %s\n%s' % (self.user, self.host, command, stdout)
-                if write:
-                    with open(write, 'a') as f:
-                        f.write(message)
-                elif ws and webuser:
-                    message_in = '[%s@%s]# %s' % (self.user, self.host, command)
-                    message_out = stdout
-                    websocket = Tailf()
-                    websocket.send_message(webuser,message_in)
-                    websocket.send_message(webuser, message_out)
-            if exited != 0:
-                message = '[%s@%s] 执行命令:%s 错误:%s, 错误信息:%s' % (
-                    self.user, self.host, command, exited, stderr)
+                message = '[%s@%s]# %s\n[ERROR] %s' % (self.user, self.host, command, stdout + stderr)
                 error_logger.error(message)
-                return result
+            else:
+                message = '[%s@%s]# %s\n%s' % (self.user, self.host, command, stdout)
+            if write:
+                with open(write, 'a') as f:
+                    f.write(message)
+            elif ws and webuser:
+                message_in = '[%s@%s]# %s' % (self.user, self.host, command)
+                message_out = stdout
+                websocket = Tailf()
+                websocket.send_message(webuser, message_in)
+                websocket.send_message(webuser, message_out)
             return result
         except Exception as e:
             message = '[%s@%s]%s' % (self.user, self.host, e)

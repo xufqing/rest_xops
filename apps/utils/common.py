@@ -1,7 +1,7 @@
 # @Time    : 2019/2/15 14:02
 # @Author  : xufqing
 
-import os, yaml, logging, nmap
+import os, yaml, logging, nmap, re
 from django.conf import settings
 from threading import Thread
 
@@ -95,13 +95,17 @@ def includes_format(path, includes_string=None):
     '''
     if not includes_string:
         return path
+    includes = []
 
-    includes = [i for i in includes_string.split('\n') if i.strip()]
-
+    for i in includes_string.split('\n'):
+        i = i.strip()
+        if i:
+            patha = os.path.split(i)
+            includes.append(patha)
     if not includes:
         return path
 
-    return ' '.join(includes)
+    return includes
 
 def async(f):
     def wrapper(*args, **kwargs):

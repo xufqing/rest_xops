@@ -90,7 +90,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'rest_xops',
-        'HOST': '127.0.0.1',
+        'HOST': 'localhost',
         'USER': 'root',
         'PASSWORD': '123456',
         'PORT': '3306',
@@ -134,7 +134,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("127.0.0.1", 16379)],
         },
     },
 }

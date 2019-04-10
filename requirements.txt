@@ -66,3 +66,4 @@ uritemplate==3.0.0
 urllib3==1.24.1
 vine==1.2.0
 zope.interface==4.6.0
+gunicorn==19.9.0

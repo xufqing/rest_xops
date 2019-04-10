@@ -1,28 +1,36 @@
 <template>
   <div :style="'width:' + width" class="container">
-    <el-card class="box-card">
-      <el-steps :active="sequence" finish-status="success" align-center>
-        <el-step title="部署前置"></el-step>
-        <el-step title="检出代码"></el-step>
-        <el-step title="部署后置"></el-step>
-        <el-step title="发布前置"></el-step>
-        <el-step title="发布"></el-step>
-        <el-step title="发布后置"></el-step>
-      </el-steps>
-    </el-card>
-    <el-card class="box-card">
-      <el-tooltip content="返回上一页" class="closepage item" effect="dark" placement="left">
-        <el-button type="info" size="mini" circle @click="closeTag"><svg-icon icon-class="return"/></el-button>
-      </el-tooltip>
-      <el-tooltip :content="content" class="lock item" effect="dark" placement="left">
-        <el-button type="info" size="mini" circle @click="doLock"><svg-icon :icon-class="ico"/></el-button>
-      </el-tooltip>
-      <div id="console" :style="'height:'+ height" class="console">
-        <div v-for="item in data" :key="item.id">
-          <span class="line-html" v-html="item"/>
-        </div>
-      </div>
-    </el-card>
+    <el-row>
+      <el-col :span="21">
+        <el-card class="box-card">
+          <el-tooltip content="返回上一页" class="closepage item" effect="dark" placement="left">
+            <el-button type="info" size="mini" circle @click="closeTag"><svg-icon icon-class="return"/></el-button>
+          </el-tooltip>
+          <el-tooltip :content="content" class="lock item" effect="dark" placement="left">
+            <el-button type="info" size="mini" circle @click="doLock"><svg-icon :icon-class="ico"/></el-button>
+          </el-tooltip>
+          <div id="console" :style="'height:'+ height" class="console">
+            <div v-for="item in data" :key="item.id">
+              <span class="line-html" v-html="item"/>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="3">
+        <el-card class="box-card">
+          <div :style="'height:' + height">
+            <el-steps :active="sequence" direction="vertical" finish-status="success" align-center>
+              <el-step title="检出前置"></el-step>
+              <el-step title="检出代码"></el-step>
+              <el-step title="检出后置"></el-step>
+              <el-step title="部署前置"></el-step>
+              <el-step title="部署"></el-step>
+              <el-step title="部署后置"></el-step>
+            </el-steps>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -155,7 +163,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 button,
 input,
 textarea {
@@ -199,5 +207,8 @@ textarea {
   right: 5px;
   bottom: 6.8%;
   z-index: 100000;
+}
+.el-card__body {
+  padding: 5px;
 }
 </style>
