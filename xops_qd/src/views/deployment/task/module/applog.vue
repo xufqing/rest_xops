@@ -22,7 +22,12 @@
       </el-row>
     </el-card>
     <el-card>
-      <el-table :data="list_data" size="small" border style="width: 100%;">
+      <div class="head-container" style="float: right">
+        <div style="font-size:15px" class="filter-item">日志搜索：</div>
+        <el-input v-model="search" style="display: inline-block;width: 200px" placeholder="请输入搜索内容" class="filter-item">
+        </el-input>
+      </div>
+      <el-table :data="tables" size="small" border style="width: 100%;">
         <el-table-column label="序号" width="80" align="center">
           <template slot-scope="scope">
             <div>{{ scope.$index + 1 }}</div>
@@ -52,6 +57,7 @@ import { retrieve } from '@/api/project'
 export default {
   data() {
     return {
+      search: '',
       listloading: false,
       servers: '',
       project_data: {
@@ -64,6 +70,18 @@ export default {
           { required: true, message: '请选择服务器', trigger: 'blur' }
         ]
       }
+    }
+  },
+  computed: {
+    // 模糊搜索
+    tables() {
+      const search = this.search
+      if (search) {
+        return this.list_data.filter(data => {
+          return data.includes(search)
+        })
+      }
+      return this.list_data
     }
   },
   created() {

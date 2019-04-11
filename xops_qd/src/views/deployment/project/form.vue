@@ -55,19 +55,28 @@
         <el-row>
           <el-col :span="9">
             <el-form-item>
-              <span class="x-info">目标服务器部署（WEB）路径<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>目标服务器的webroot路径<br/>例：tomcat webapps</span></div>
+                <span class="x-info">目标服务器部署（WEB）路径<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <el-input v-model="form.target_root" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
           <el-col :span="9">
             <el-form-item>
-              <span class="x-info">目标服务器RELEASE路径（版本仓库）<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>存放应用版本的路径</span></div>
+                <span class="x-info">目标服务器RELEASE路径（版本仓库）<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <el-input v-model="form.target_releases" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item>
-              <span class="x-info">仓库版本保留数<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>需要保存的版本数量</span></div>
+                <span class="x-info">仓库版本保留数<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <el-input v-model="form.version_num" :readonly="is_Readonly" style="width: 200px;"/>
             </el-form-item>
           </el-col>
@@ -78,7 +87,10 @@
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">排除的文件<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>自动打包并传输到目标服务器<br/>例：编译后的需要发布的文件</span></div>
+                <span class="x-info">排除的文件<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <el-radio v-model="form.is_include" label="false">排除</el-radio>
               <el-radio v-model="form.is_include" label="true">包含</el-radio>
               <codemirror v-model="form.excludes" :options="cmOptions" class="x-code"></codemirror>
@@ -87,7 +99,7 @@
           <el-col :span="12">
             <el-form-item>
               <el-tooltip class="item" effect="dark" placement="top">
-                <div slot="content">目标路径：{WEB_ROOT}<br/>代码路径：{CODE_ROOT}<br/>项目别名：{ALIAS}<br/>执行时间：{START_TIME}<br/><span style="color:#ff9955;">其他变量可自定义</span></div>
+                <div slot="content">目标路径：$WEB_ROOT<br/>代码路径：$CODE_ROOT<br/>项目别名：$ALIAS<br/>执行时间：$START_TIME<br/><span style="color:#ff9955;">其他变量可自定义</span></div>
                 <span class="x-info">全局变量<i class="el-icon-info"></i></span>
               </el-tooltip>
               <codemirror v-model="form.task_envs" :options="cmOptions" class="x-code"></codemirror>
@@ -97,13 +109,19 @@
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">Checkout前置任务<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>checkout前执行的任务<br/>例：删除上次编译版本残留文件</span></div>
+                <span class="x-info">Checkout前置任务<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <codemirror v-model="form.prev_deploy" :options="cmOptions" class="x-code"></codemirror>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">Checkout后置任务<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>checkout后执行的任务<br/>例如：版本编译</span></div>
+                <span class="x-info">Checkout后置任务<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <codemirror v-model="form.post_deploy" :options="cmOptions" class="x-code"></codemirror>
             </el-form-item>
           </el-col>
@@ -111,13 +129,19 @@
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">Deploy前置任务<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>部署前执行的任务<br/>例：停止应用</span></div>
+                <span class="x-info">Deploy前置任务<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <codemirror v-model="form.prev_release" :options="cmOptions" class="x-code"></codemirror>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">Deploy后置任务<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>部署后执行的任务<br/>例：启动应用</span></div>
+                <span class="x-info">Deploy后置任务<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <codemirror v-model="form.post_release" :options="cmOptions" class="x-code"></codemirror>
             </el-form-item>
           </el-col>
@@ -128,13 +152,19 @@
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">启动脚本路径<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>应用启动的脚本路径<br/>例：tomcat启动脚本</span></div>
+                <span class="x-info">启动脚本路径<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <el-input v-model="form.app_start" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">停止脚本路径<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>应用停止的脚本路径<br/>例：tomcat停止脚本</span></div>
+                <span class="x-info">停止脚本路径<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <el-input v-model="form.app_stop" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
@@ -142,13 +172,19 @@
         <el-row>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">日志存放目录<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>应用日志存放的目录</span></div>
+                <span class="x-info">日志存放目录<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <el-input v-model="form.app_log_path" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item>
-              <span class="x-info">实时日志路径<i class="el-icon-info"></i></span>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>需要实时查看的日志路径</span></div>
+                <span class="x-info">实时日志路径<i class="el-icon-info"></i></span>
+              </el-tooltip>
               <el-input v-model="form.app_log_file" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>

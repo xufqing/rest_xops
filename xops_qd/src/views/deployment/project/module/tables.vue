@@ -3,7 +3,11 @@
     <!--表格渲染-->
     <el-table v-loading="sup_this.loading" :data="sup_this.data" size="small" border style="width: 100%;">
       <el-table-column prop="name" label="名称"/>
-      <el-table-column prop="environment" label="环境" width="200"/>
+      <el-table-column label="环境" width="200">
+        <template slot-scope="scope">
+          <span>{{ scope.row.environment == 'dev' ? '开发环境': scope.row.environment == 'test' ? '测试环境':scope.row.environment == 'prod' ? '生产环境':scope.row.environment }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="初始化状态" width="150">
         <template slot-scope="scope">
           <span v-if="scope.row.status == 'Succeed'" style="color:#00CC00">成功</span>

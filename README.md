@@ -67,12 +67,14 @@ MySql 5.6.42
 
 CentOS 7
 
-==***系统更新方式***==
+***系统更新方式（测试）***
 ```
 cd 你的项目地址
 sh upgrade.sh
 更新完毕后，修改管理员密码
 python manage.py changepassword admin
+
+前端更新build后放到你的nginx静态目录
 ```
 
 ***基础环境安装***
@@ -272,35 +274,7 @@ npm run dev
 
     /home/xufeng/.pyenv/versions/rest_xops 是你的python虚拟环境的版本
 
-
-
-**2、安装uwsgi**
-
-```
- cd /home/xufeng/rest_xops
- 
- pip install uwsgi
-
-```
-**3、设置Uwsgi配置文件**
-
-```
-vim /etc/xops_uwsgi.ini
-
-[uwsgi]
-chdir = /home/xufeng/rest_xops/
-module = rest_xops.wsgi:application
-# 虚拟环境目录
-home = /home/xufeng/.pyenv/versions/rest_xops
-# process-related settings
-master = true
-processes = 10
-socket = 127.0.0.1:8000
-max-requests = 5000
-vacuum = true
-
-```
-**4、设置supervisord**
+**2、设置supervisord**
 - xops_gunicorn
 ```
 vim /etc/supervisord.d/xops_gunicorn.ini
@@ -331,13 +305,13 @@ stderr_logfile=/var/log/rest_xops/asgi.log
 stdout_logfile_maxbytes = 20MB
 ```
 
-**6、重启supervisord**
+**3、重启supervisord**
 
     supervisorctl reload
 
     systemctl restart supervisord
 
-**7、查看运行状态**
+**4、查看运行状态**
 
     supervisorctl status
 
@@ -354,14 +328,13 @@ celery-worker                    RUNNING   pid 15321, uptime 1:42:45
 xops                             RUNNING   pid 15328, uptime 1:42:44
 [root@xuxu xufeng]# supervisorctl status
 ```
-**8、生产静态页面**
+**5、生产静态页面**
 ```
 cd rest_xops/xops_qd
 npm run build
-```
 将xops_qd/dist目录下生成的文件复制到你的服务器nginx web root目录
-
-**9、配置NGINX*
+```
+**6、配置NGINX
 
 ```
 upstream xops {

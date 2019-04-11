@@ -162,53 +162,41 @@ export default {
   }
 }
 </script>
-
 <style>
-button,
-input,
-textarea {
-  outline: 0;
-}
-.line-html {
-  line-height: 1.85
-}
-.container .buttons .closes,
-.container .buttons .maximize,
-.container .buttons .minimize {
-  padding: 0;
-  margin: 0;
-  margin-right: 6px;
-  width: 12px;
-  height: 12px;
-  border: 1px solid transparent;
-  border-radius: 6px;
-}
-.container {
-  width: 100%;
-  margin: 5px;
-}
-.container .console {
-  font-family: consolas;
-  overflow-y: scroll;
-  background: #494949;
-  color: #f7f7f7;
-  padding: 10px;
-  font-size: 14px;
-}
-.lock {
-  position: fixed;
-  right: 45px;
-  bottom: 6.8%;
-  z-index: 100000;
-}
-.closepage {
-  margin: 40px;
-  position: fixed;
-  right: 5px;
-  bottom: 6.8%;
-  z-index: 100000;
-}
-.el-card__body {
-  padding: 5px;
-}
+  button,input,textarea {
+    outline: 0
+  }
+  .line-html {
+    line-height: 1.85
+  }
+  .closepage {
+    margin: 40px;
+    position: fixed;
+    right: 115px;
+    bottom: 2%;
+    z-index: 100000;
+  }
+  .el-card__body {
+    padding: 5px;
+  }
+  .container {
+    width: 100%;
+    margin: 5px
+  }
+  .container .console {
+    font-family: "Interstate", "Hind", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+    overflow-y: scroll;
+    background: #494949;
+    color: #f7f7f7;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 3px 1px 3px 3px;
+  }
+  .lock {
+    position: fixed;
+    right: 155px;
+    bottom: 2%;
+    z-index: 100000
+  }
 </style>
+

@@ -9,10 +9,10 @@
       <el-col :span="10">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
-            <span>应用管理-{{ project_data.environment }}</span>
+            <span>应用管理</span>
           </div>
-          <div style="height: 152px">
-            <el-form ref="project" :model="project_data" :rules="rules" size="small" label-width="80px">
+          <div>
+            <el-form ref="project" :model="project_data" :rules="rules" size="small" label-width="80px" style="margin: 0px 33px">
               <el-form-item label="服务器" prop="server_ids">
                 <el-select v-model="project_data.server_ids" placeholder="请选择服务器" style="width: 230px;">
                   <el-option v-for="item in hosts" :key="item.key" :label="item.label" :value="item.key"/>
@@ -31,23 +31,25 @@
       <el-col :span="14">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
-            <span>日志管理-{{ project_data.environment }}</span>
+            <span>日志管理</span>
           </div>
-          <el-form ref="log" :model="log_data" :rules="rules" size="small" label-width="80px">
+          <el-form ref="log" :inline="true" :model="log_data" :rules="rules" size="small" label-width="80px" >
             <el-form-item label="过滤条件" prop="filter">
               <el-input v-model="log_data.filter" placeholder="可输入关键字过滤" style="width: 230px;"/>
             </el-form-item>
             <el-form-item label="服务器" prop="server_ids">
-              <el-select v-model="log_data.server_ids" placeholder="请选择服务器" style="width: 230px;">
+              <el-select v-model="log_data.server_ids" placeholder="请选择服务器" style="width: 150px;">
                 <el-option v-for="item in hosts" :key="item.key" :label="item.label" :value="item.key"/>
               </el-select>
             </el-form-item>
-            <el-form-item>
-              <div style="display: inline-block;margin: 0px 1px;">
-                <el-button :loading="tailloading" size="mini" type="primary" icon="el-icon-check" @click="doTailStart">监控日志</el-button>
-                <el-button size="mini" type="danger" icon="el-icon-close" @click="doTailStop">停止监控</el-button>
-              </div>
-            </el-form-item>
+            <div style="margin: 0px 160px;">
+              <el-form-item>
+                <div style="display: inline-block;margin: 0px 1px;">
+                  <el-button :loading="tailloading" size="mini" type="primary" icon="el-icon-check" @click="doTailStart">监控日志</el-button>
+                  <el-button size="mini" type="danger" icon="el-icon-close" @click="doTailStop">停止监控</el-button>
+                </div>
+              </el-form-item>
+            </div>
           </el-form>
         </el-card>
       </el-col>
@@ -258,7 +260,7 @@ export default {
             this.$message({
               showClose: true,
               type: 'success',
-              message: '执行成功!请等待线程结束.',
+              message: '停止成功!',
               duration: 3500
             })
             this.tailloading = false
@@ -359,12 +361,13 @@ textarea {
   margin: 5px;
 }
 .container .console {
-  font-family: consolas;
+  font-family: "Interstate", "Hind", -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
   overflow-y: scroll;
   background: #494949;
   color: #f7f7f7;
   padding: 10px;
   font-size: 14px;
+  border-radius: 3px 1px 3px 3px;
 }
 .lock {
   position: fixed;

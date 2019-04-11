@@ -27,26 +27,6 @@ class AppLogView(APIView):
     permission_classes = (RbacPermission,)
     authentication_classes = (JSONWebTokenAuthentication,)
 
-    # def get(self, request, format=None):
-    #     file_path = request.query_params['file']
-    #     host = request.query_params['sid']
-    #     file_name = os.path.basename(file_path)
-    #     dir_name = os.path.dirname(file_path)
-    #     new_file_name = os.path.splitext(file_name)[0] + '.tar.gz'
-    #     auth_info, auth_key = auth_init(host)
-    #     connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
-    #     commands = 'mkdir -p /tmp/remote/ && tar czf /tmp/remote/%s -C %s %s' % (new_file_name, dir_name,file_name)
-    #     connect.run(commands)
-    #     connect.get('/tmp/remote/' + new_file_name, '/tmp/' + new_file_name)
-    #     response = FileResponse(open('/tmp/' + new_file_name, 'rb'))
-    #     response['Content-Type'] = 'application/octet-stream'
-    #     response['Content-Disposition'] = 'attachment;filename="%s"' % new_file_name
-    #     commands = 'rm -f /tmp/remote/%s' % (new_file_name)
-    #     connect.run(commands)
-    #     connect.close()
-    #     os.remove('/tmp/' + new_file_name)
-    #     return response
-
     def post(self, request, format=None):
         if request.data['excu'] == 'list':
             try:

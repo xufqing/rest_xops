@@ -282,15 +282,15 @@ class DeployExcu(object):
             self.do_checkout(version, log)
             self.do_post_deploy(log)
             for sid in serverid:
-                try:
+                if sid:
                     auth_info, auth_key = auth_init(sid)
                     connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
                     self.do_prev_release(log, connect)
                     self.do_release(log, connect)
                     self.do_post_release(log, connect)
-                except Exception as e:
+                else:
                     send = Tailf()
-                    send.send_message(webuser, str(e))
+                    send.send_message(webuser, '没有选择远程服务器！！！')
             self.end(serverid, record_id)
         except Exception as e:
             send = Tailf()

@@ -1,5 +1,5 @@
 <template>
-  <el-tabs v-model="active" type="card" @tab-click="handleClick">
+  <el-tabs v-model="active" type="card">
     <el-tab-pane label="综合工具" name="tools">
       <keep-alive>
         <Tools/>
@@ -20,11 +20,6 @@ export default {
   data() {
     return {
       active: 'tools'
-    }
-  },
-  methods: {
-    handleClick(tab, event) {
-      console.log(tab, event)
     }
   }
 }

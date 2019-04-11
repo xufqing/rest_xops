@@ -238,8 +238,7 @@ class DeployView(APIView):
                 auth_info, auth_key = auth_init(host)
                 connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
                 app_start = app_start.strip().replace('&&', '').replace('||', '')
-                commands = '/bin/bash -e %s' % (app_start)
-                connect.run(commands, pty=True, ws=True, webuser=webuser)
+                connect.run(app_start, pty=True, ws=True, webuser=webuser)
                 connect.close()
                 http_status = OK
                 request_status = '执行成功!'
@@ -257,8 +256,7 @@ class DeployView(APIView):
                 auth_info, auth_key = auth_init(host)
                 connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
                 app_stop = app_stop.strip().replace('&&', '').replace('||', '')
-                commands = '/bin/bash -e %s' % (app_stop)
-                connect.run(commands, pty=True, ws=True, webuser=webuser)
+                connect.run(app_stop, pty=True, ws=True, webuser=webuser)
                 connect.close()
                 http_status = OK
                 request_status = '执行成功!'
