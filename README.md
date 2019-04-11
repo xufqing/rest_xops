@@ -67,7 +67,16 @@ MySql 5.6.42
 
 CentOS 7
 
+==***系统更新方式***==
+```
+cd 你的项目地址
+sh upgrade.sh
+更新完毕后，修改管理员密码
+python manage.py changepassword admin
+```
+
 ***基础环境安装***
+
 
 1、安装npm运行环境(略)
 
