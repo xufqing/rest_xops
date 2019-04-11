@@ -1,13 +1,12 @@
 # @Time    : 2019/2/15 14:02
 # @Author  : xufqing
 
-import os, yaml, logging, nmap, re
+import os, yaml, logging, nmap
 from django.conf import settings
 from threading import Thread
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rest_xops.settings')
 error_logger = logging.getLogger('error')
-
 
 class ConfigFileMixin:
     config_file = None

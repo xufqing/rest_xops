@@ -146,16 +146,21 @@ class DeployExcu(object):
             self.sequence = 4
             with open(log, 'a') as f:
                 f.write('[INFO]------正在执行部署前的工作[%s]------\n' % (self.sequence))
+
+            target_release_version = "%s/%s" % (self.target_releases, self.release_version)
+
             # 创建远程target_releases目录
-            command = '[ -d %s ] || mkdir -p %s' % (self.target_releases, self.target_releases)
+            command = '[ -d %s ] || mkdir -p %s' % (target_release_version, target_release_version)
             if self.result.exited == 0:
                 self.result = connect.run(command, write=log)
+
             # 上传压缩包
             self.file = '%s/%s' % (self.local_project_path.rstrip('/'), self.release_version + '.tar')
             if self.result.exited == 0:
                 with open(log, 'a') as f:
                     f.write('[INFO]------正在上传压缩包至远程服务器------\n')
-                self.result = connect.put(self.file, remote=self.target_releases, write=log)
+                self.result = connect.put(self.file, remote=target_release_version, write=log)
+
             # 判断是否超过可存档的数量
             with connect.cd(self.target_releases):
                 command = 'ls -l |grep "^d"|wc -l'
@@ -173,11 +178,9 @@ class DeployExcu(object):
                         DeployRecord.objects.filter(record_id=last_record_id).update(is_rollback=False)
 
             # 解压并删除压缩源
-            with connect.cd(self.target_releases):
-                command = 'mkdir %s && mv %s %s && cd %s && tar xf %s && rm -f %s' % \
-                          (self.release_version, self.release_version + '.tar', self.release_version,
-                           self.release_version, self.release_version + '.tar',
-                           self.release_version + '.tar')
+            with connect.cd(target_release_version):
+                command = 'tar xf %s && rm -f %s' % \
+                          (self.release_version + '.tar',self.release_version + '.tar')
                 if self.result.exited == 0:
                     self.result = connect.run(command, write=log)
 
@@ -187,7 +190,6 @@ class DeployExcu(object):
                 for command in commands.split('\n'):
                     if command.strip().startswith('#') or not command.strip():
                         continue
-                    target_release_version = "%s/%s" % (self.target_releases, self.release_version)
                     with connect.cd(target_release_version):
                         if self.result.exited == 0:
                             self.result = connect.run(command, write=log)
@@ -205,7 +207,7 @@ class DeployExcu(object):
             if self.result.exited == 0:
                 self.result = connect.run(command, write=log)
             # 检查上次的版本
-            with connect.cd(self.target_releases):
+            with connect.cd(self.target_root):
                 version_file = '%s/%s' % (self.target_root, self.alias + '_version.txt')
                 command = 'touch %s && cat %s' % (version_file, version_file)
                 if self.result.exited == 0:

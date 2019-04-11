@@ -122,11 +122,13 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',#
         'rest_framework.authentication.SessionAuthentication',#
     ),
+    # 自定义异常处理
+    'EXCEPTION_HANDLER': 'apps.common.custom.xops_exception_handler'
 }
 
 #jwt setting
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=3),
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
 # django-channels配置

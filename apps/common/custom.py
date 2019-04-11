@@ -7,9 +7,20 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_xops.basic import XopsResponse
 from rest_framework.generics import ListAPIView
+from rest_framework.views import exception_handler
 from errno import errorcode
-from rest_framework import permissions
 import celery
+
+def xops_exception_handler(exc, context):
+    response = exception_handler(exc, context)
+    if response is not None:
+        msg = '失败' if response.status_code >= 400 else '成功'
+        notification_response = {}
+        notification_response['code'] = response.status_code
+        notification_response['message'] = msg
+        notification_response['detail'] = response.data
+        response.data = notification_response
+    return response
 
 class CommonPagination(PageNumberPagination):
     '''

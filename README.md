@@ -10,6 +10,11 @@ demo地址: http://demo.xufqing.cn
 
 ![4.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/4.png)
 
+**持续构建样例**
+
+![11.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/11.png)
+![22.png](https://raw.githubusercontent.com/xufqing/rest_xops/master/demo/22.png)
+
 ***特色功能开发进度***
 
 - 已完成
@@ -68,12 +73,12 @@ CentOS 7
 
     安装前端项目依赖包
     
-    cd xops_qd_source/
+    cd xops_qd/
     npm install
 
 2、修改你的配置文件
 
-    xops_qd_source/config
+    xops_qd/config
 
     dev.env.js #开发环境
 
@@ -342,10 +347,10 @@ xops                             RUNNING   pid 15328, uptime 1:42:44
 ```
 **8、生产静态页面**
 ```
-cd rest_xops/xops_qd_source
+cd rest_xops/xops_qd
 npm run build
 ```
-将xops_qd_source/dist目录下生成的文件复制到你的服务器nginx web root目录
+将xops_qd/dist目录下生成的文件复制到你的服务器nginx web root目录
 
 **9、配置NGINX*
 
@@ -377,6 +382,9 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location ^~/static  {
+        alias /home/xufeng/rest_xops/static;
     }
     location ^~/media  {
         alias /home/xufeng/rest_xops/media;
