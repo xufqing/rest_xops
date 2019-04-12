@@ -221,8 +221,6 @@ class DeployView(APIView):
                 print(webuser)
                 msg = Tailf()
                 if scenario == 0:
-                    gl._init()
-                    gl.set_value('deploy_' + str(webuser), False)
                     logs = msg.local_tailf(logfile, webuser)
                     for m in logs:
                         msg.send_message(webuser,m)

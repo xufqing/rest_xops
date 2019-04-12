@@ -7,7 +7,9 @@ from utils.common import includes_format, excludes_format, async
 import utils.globalvar as gl
 from utils.websocket_tail import Tailf
 from django.conf import settings
-import os
+import os, asyncio
+
+
 
 
 class DeployExcu(object):
@@ -248,11 +250,6 @@ class DeployExcu(object):
             connect.close()
 
     def end(self, server_ids, record_id):
-        if self.localhost:
-            # 关闭连接
-            self.localhost.close()
-        # 关闭死循环读取本地日志
-        gl.set_value('deploy_' + str(self.webuser), True)
         sid = ','.join(server_ids)
         defaults = {
             'record_id': record_id,
@@ -273,9 +270,10 @@ class DeployExcu(object):
             defaults['is_rollback'] = False
             DeployRecord.objects.filter(name=name).update(**defaults)
             Project.objects.filter(id=self.project_id).update(last_task_status='Failed')
-
     @async
     def start(self, log, version, serverid, record_id, webuser, start_time):
+        gl._init()
+        gl.set_value('deploy_' + str(webuser), False)
         self.start_time = start_time
         with open(log, 'a') as f:
             f.write('[INFO]版本: %s 执行用户: %s 开始时间: %s\n[INFO]本次部署日志路径: %s\n' % (version,webuser,start_time,log))
@@ -298,3 +296,9 @@ class DeployExcu(object):
             self.end(serverid, record_id)
         except Exception as e:
             Tailf.send_message(webuser, str(e))
+        finally:
+            if self.localhost:
+                # 关闭连接
+                self.localhost.close()
+            # 关闭死循环读取本地日志
+            gl.set_value('deploy_' + str(self.webuser), True)
