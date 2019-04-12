@@ -14,7 +14,7 @@ class Tailf(object):
     def send_message(self, user, message):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(user, {"type": "user.message", 'message': message})
-        
+
     @async
     def local_tailf(self, logfile, webuser):
         f = open(logfile, 'rt')
