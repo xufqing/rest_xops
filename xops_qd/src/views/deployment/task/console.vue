@@ -13,6 +13,9 @@
             <div v-for="item in data" :key="item.id">
               <span class="line-html" v-html="item"/>
             </div>
+            <div style="text-align:center">
+              <span v-loading="loading" element-loading-spinner="el-icon-loading"/>
+            </div>
           </div>
         </el-card>
       </el-col>
@@ -48,7 +51,8 @@ export default {
       width: document.documentElement.clientWidth - 225 + 'px;',
       data: [],
       vm: null,
-      sequence: 1
+      sequence: 1,
+      loading: true
     }
   },
   // 监听控制滚动条
@@ -65,11 +69,17 @@ export default {
     }
   },
   mounted: function() {
-    this.initWebSocket()
+    if (this.$route.query.scenario === 0) {
+      this.initWebSocket()
+    } else {
+      this.readLog()
+    }
   },
   beforeDestroy: function() {
-    this.vm.$disconnect()
-    console.log('---离开页面关闭Websocket---')
+    if (this.$route.query.scenario === 0) {
+      this.vm.$disconnect()
+      console.log('---离开页面关闭Websocket---')
+    }
   },
   methods: {
     parseTime,
@@ -109,13 +119,35 @@ export default {
       // 开始读取
       DeployExcu(data)
     },
+    // 读取部署日志
+    readLog() {
+      const form = {
+        excu: 'readlog',
+        id: this.$route.query.id,
+        alias: this.$route.query.alias,
+        record: this.$route.query.record,
+        scenario: 1
+      }
+      DeployExcu(form).then(res => {
+        const content = res.split('\n')
+        const _this = this
+        content.forEach(function(new_data, index) {
+          _this.data.push(_this.getColor(new_data))
+        })
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     closeTag() {
       this.$confirm('是否关闭页面并返回上一页?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.vm.$disconnect()
+        if (this.$route.query.scenario === 0) {
+          this.vm.$disconnect()
+          console.log('---离开页面关闭Websocket---')
+        }
         this.$router.go(-1)
         this.$store.dispatch('delView', this.$store.state.tagsView.visitedViews.slice(-1)[0])
       }).catch(() => {
@@ -128,6 +160,7 @@ export default {
     getColor(text) {
       const info = text.match(/INFO/i)
       const warn = text.match(/WARN/i)
+      const warning = text.match(/WARNING/i)
       const debug = text.match(/DEBUG/i)
       const host = text.match(/\[(.*?)@(.*?)\]/)
       const error = text.match(/ERROR/i)
@@ -137,6 +170,8 @@ export default {
       }
       if (info) {
         return text.replace(/INFO/i, '<span style="color: #7FFF00;">' + info + '</span>')
+      } else if (warning) {
+        return text.replace(/WARNING/i, '<span style="color: #FFFF00;">' + warning + '</span>')
       } else if (warn) {
         return text.replace(/WARN/i, '<span style="color: #FFFF00;">' + warn + '</span>')
       } else if (debug) {
@@ -165,6 +200,9 @@ export default {
 <style>
   button,input,textarea {
     outline: 0
+  }
+  .loadclass {
+    height: 25px;
   }
   .line-html {
     line-height: 1.85

@@ -14,14 +14,6 @@ class Tailf(object):
     def send_message(self, user, message):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(user, {"type": "user.message", 'message': message})
-
-    def read_file(self,logfile, webuser):
-        try:
-            with open(logfile, 'rt') as f:
-                for line in f:
-                    self.send_message(webuser, line)
-        except Exception as e:
-            self.send_message(webuser, e)
     @async
     def local_tail(self, logfile, webuser):
         # 创建一个可跨文件的全局变量，以便控制死循环

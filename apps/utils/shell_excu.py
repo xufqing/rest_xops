@@ -90,7 +90,7 @@ class Shell(Connection):
         try:
             if wtype == 'put':
                 result = super(Shell, self).put(local, remote=remote)
-                message = '[%s@%s]# [上传文件]\n[INFO]local:%s to [%s]:%s' % (
+                message = '[%s@%s]# [上传文件]\n[INFO]local:%s to [%s]:%s\n' % (
                             self.user, self.host, local, result.connection.host, remote)
                 info_logger.info(message)
                 if write:
@@ -100,7 +100,7 @@ class Shell(Connection):
                     Tailf.send_message(webuser,message)
             else:
                 result = super(Shell, self).get(remote, local=local)
-                message = '[%s@%s]# [下载文件]\n[INFO] [%s]:%s  to local:%s' % (
+                message = '[%s@%s]# [下载文件]\n[INFO] [%s]:%s  to local:%s\n' % (
                             self.user, self.host, result.connection.host, remote, local)
                 info_logger.info(message)
                 if write:
@@ -111,7 +111,7 @@ class Shell(Connection):
             return result
         except Exception as e:
             if wtype == 'put':
-                message = '[%s@%s]# [上传文件]\n[ERROR][目标目录:%s][%s]' % (self.user, self.host, remote, str(e))
+                message = '[%s@%s]# [上传文件]\n[ERROR][目标目录:%s][%s]\n' % (self.user, self.host, remote, str(e))
                 error_logger.info(message)
                 if write:
                     with open(write, 'a') as f:
@@ -119,7 +119,7 @@ class Shell(Connection):
                 elif ws and webuser:
                     Tailf.send_message(webuser,message)
             else:
-                message = '[%s@%s]# [下载文件]\n[ERROR][目标目录:%s][%s]' % (self.user, self.host, remote, str(e))
+                message = '[%s@%s]# [下载文件]\n[ERROR][目标目录:%s][%s]\n' % (self.user, self.host, remote, str(e))
                 error_logger.info(message)
                 if write:
                     with open(write, 'a') as f:

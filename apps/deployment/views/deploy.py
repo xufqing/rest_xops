@@ -17,6 +17,7 @@ from utils.websocket_tail import Tailf
 from utils.deploy_excu import DeployExcu
 import utils.globalvar as gl
 from django.conf import settings
+from django.http import FileResponse
 
 error_logger = logging.getLogger('error')
 info_logger = logging.getLogger('info')
@@ -220,10 +221,24 @@ class DeployView(APIView):
                 msg = Tailf()
                 if scenario == 0:
                     msg.local_tail(logfile, webuser)
-                else:
-                    msg.read_file(logfile, webuser)
                 http_status = OK
                 request_status = '执行成功!'
+            except Exception:
+                http_status = BAD
+                request_status ='执行错误:文件不存在!'
+            return XopsResponse(request_status, status=http_status)
+
+        elif request.data['excu'] == 'readlog' and request.data['scenario'] == 1:
+            # 读取部署日志
+            try:
+                id = request.data['id']
+                alias = request.data['alias']
+                record = request.data['record']
+                logfile = self._path.rstrip('/') + '/' + str(id) + '_' + str(alias) + '/logs/' + record + '.log'
+                response = FileResponse(open(logfile, 'rb'))
+                response['Content-Type'] = 'text/plain'
+                #response['Content-Disposition'] = 'attachment;filename="%s"' % record + 'log'
+                return response
             except Exception:
                 http_status = BAD
                 request_status ='执行错误:文件不存在!'

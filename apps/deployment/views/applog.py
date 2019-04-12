@@ -46,6 +46,7 @@ class AppLogView(APIView):
                 http_status = BAD
                 res = '执行错误:' + str(e)
             return XopsResponse(res, status=http_status)
+
         elif request.data['excu'] == 'filedown':
             file_path = request.data['file_path']
             host = request.data['host']
