@@ -1,6 +1,6 @@
 # @Time    : 2019/3/21 16:16
 # @Author  : xufqing
-import paramiko, logging
+import paramiko, logging, time
 from paramiko_expect import SSHClientInteraction
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -10,7 +10,7 @@ import utils.globalvar as gl
 info_logger = logging.getLogger('info')
 
 class Tailf(object):
-
+    @classmethod
     def send_message(self, user, message):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(user, {"type": "user.message", 'message': message})

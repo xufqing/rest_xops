@@ -289,12 +289,9 @@ class DeployExcu(object):
                         self.do_release(log, connect)
                         self.do_post_release(log, connect)
                     else:
-                        send = Tailf()
-                        send.send_message(webuser, '[ERROR]服务器ID%s已被删除，部署继续执行!')
+                        Tailf.send_message(webuser, '[ERROR]服务器ID%s已被删除，部署继续执行!')
                 else:
-                    send = Tailf()
-                    send.send_message(webuser, '没有选择远程服务器！！！')
+                    Tailf.send_message(webuser, '没有选择远程服务器！！！')
             self.end(serverid, record_id)
         except Exception as e:
-            send = Tailf()
-            send.send_message(webuser, str(e))
+            Tailf.send_message(webuser, str(e))

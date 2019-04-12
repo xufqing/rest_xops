@@ -71,10 +71,9 @@ class Shell(Connection):
             elif ws and webuser:
                 message_in = '[%s@%s]# %s' % (self.user, self.host, command)
                 message_out = '[ERROR] %s' % (str(e))
-                websocket = Tailf()
-                websocket.send_message(webuser, message_in)
+                Tailf.send_message(webuser, message_in)
                 for m in message_out.split('\n'):
-                    websocket.send_message(webuser, m)
+                    Tailf.send_message(webuser, m)
             result = Result(exited=-1, stderr=message, stdout=message)
             return result
 
@@ -98,8 +97,7 @@ class Shell(Connection):
                     with open(write, 'a') as f:
                         f.write(message)
                 elif ws and webuser:
-                    websocket = Tailf()
-                    websocket.send_message(webuser,message)
+                    Tailf.send_message(webuser,message)
             else:
                 result = super(Shell, self).get(remote, local=local)
                 message = '[%s@%s]# [下载文件]\n[INFO] [%s]:%s  to local:%s' % (
@@ -109,8 +107,7 @@ class Shell(Connection):
                     with open(write, 'a') as f:
                         f.write(message)
                 elif ws and webuser:
-                    websocket = Tailf()
-                    websocket.send_message(webuser,message)
+                    Tailf.send_message(webuser,message)
             return result
         except Exception as e:
             if wtype == 'put':
@@ -120,8 +117,7 @@ class Shell(Connection):
                     with open(write, 'a') as f:
                         f.write(message)
                 elif ws and webuser:
-                    websocket = Tailf()
-                    websocket.send_message(webuser,message)
+                    Tailf.send_message(webuser,message)
             else:
                 message = '[%s@%s]# [下载文件]\n[ERROR][目标目录:%s][%s]' % (self.user, self.host, remote, str(e))
                 error_logger.info(message)
@@ -129,5 +125,4 @@ class Shell(Connection):
                     with open(write, 'a') as f:
                         f.write(message)
                 elif ws and webuser:
-                    websocket = Tailf()
-                    websocket.send_message(webuser,message)
+                    Tailf.send_message(webuser,message)
