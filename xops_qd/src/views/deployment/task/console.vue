@@ -14,7 +14,7 @@
               <span class="line-html" v-html="item"/>
             </div>
             <div style="text-align:center">
-              <span v-loading="loading" element-loading-spinner="el-icon-loading"/>
+              <span v-loading="sequence == 6 ? false : true" element-loading-spinner="el-icon-loading"/>
             </div>
           </div>
         </el-card>
@@ -51,8 +51,7 @@ export default {
       width: document.documentElement.clientWidth - 225 + 'px;',
       data: [],
       vm: null,
-      sequence: 1,
-      loading: true
+      sequence: 1
     }
   },
   // 监听控制滚动条
@@ -73,6 +72,10 @@ export default {
       this.initWebSocket()
     } else {
       this.readLog()
+    }
+    const that = this
+    window.onresize = function temp() {
+      that.height = document.documentElement.clientHeight - 94.5 + 'px;'
     }
   },
   beforeDestroy: function() {

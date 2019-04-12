@@ -176,6 +176,10 @@ export default {
         this.log_data.app_log_file = res.app_log_file
         this.log_data.server_ids = res.server_ids
       })
+      const that = this
+      window.onresize = function temp() {
+        that.height = document.documentElement.clientHeight - 94.5 + 'px;'
+      }
     },
     start() {
       this.$socket.onopen = (data) => {

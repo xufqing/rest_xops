@@ -161,7 +161,7 @@ class DeployView(APIView):
             Project.objects.filter(id=record[0]['project_id']).update(last_task_status='Succeed')
             sequence = 6
             with open(log, 'a') as f:
-                f.write('[INFO]------回滚完成[%s]------\n' % (sequence))
+                f.write('[INFO]------回滚完成,请重启应用[%s]------\n' % (sequence))
 
     def post(self, request, format=None):
         if request.data['excu'] == 'init':
@@ -237,7 +237,6 @@ class DeployView(APIView):
                 logfile = self._path.rstrip('/') + '/' + str(id) + '_' + str(alias) + '/logs/' + record + '.log'
                 response = FileResponse(open(logfile, 'rb'))
                 response['Content-Type'] = 'text/plain'
-                #response['Content-Disposition'] = 'attachment;filename="%s"' % record + 'log'
                 return response
             except Exception:
                 http_status = BAD

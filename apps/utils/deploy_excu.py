@@ -289,7 +289,7 @@ class DeployExcu(object):
                         self.do_release(log, connect)
                         self.do_post_release(log, connect)
                     else:
-                        Tailf.send_message(webuser, '[ERROR]服务器ID%s已被删除，部署继续执行!')
+                        Tailf.send_message(webuser, '[ERROR]服务器ID%s已被删除，部署继续执行!' % sid)
                 else:
                     Tailf.send_message(webuser, '没有选择远程服务器！！！')
             self.end(serverid, record_id)
