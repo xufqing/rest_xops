@@ -161,6 +161,9 @@ class DeployExcu(object):
                     f.write('[INFO]------正在上传压缩包至远程服务器------\n')
                 self.result = connect.put(self.file, remote=target_release_version, write=log)
 
+            # 删除打包的源文件
+            self.localhost.local('rm -f %s' % (self.file))
+
             # 判断是否超过可存档的数量
             with connect.cd(self.target_releases):
                 command = 'ls -l |grep "^d"|wc -l'
@@ -246,8 +249,6 @@ class DeployExcu(object):
 
     def end(self, server_ids, record_id):
         if self.localhost:
-            # 删除打包的源文件
-            self.localhost.local('rm -f %s' % (self.file))
             # 关闭连接
             self.localhost.close()
         # 关闭死循环读取本地日志
@@ -276,6 +277,8 @@ class DeployExcu(object):
     @async
     def start(self, log, version, serverid, record_id, webuser, start_time):
         self.start_time = start_time
+        with open(log, 'a') as f:
+            f.write('[INFO]版本: %s 执行用户: %s 开始时间: %s\n[INFO]本次部署日志路径: %s\n' % (version,webuser,start_time,log))
         try:
             self.do_prev_deploy(log)
             self.do_checkout(version, log)

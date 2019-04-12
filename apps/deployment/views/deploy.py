@@ -218,14 +218,18 @@ class DeployView(APIView):
                 scenario = int(request.data['scenario'])
                 logfile = self._path.rstrip('/') + '/' + str(id) + '_' + str(alias) + '/logs/' + record + '.log'
                 webuser = request.user.username
+                print(webuser)
                 msg = Tailf()
                 if scenario == 0:
-                    msg.local_tail(logfile, webuser)
+                    gl._init()
+                    gl.set_value('deploy_' + str(webuser), False)
+                    msg.local_tailf(logfile, webuser)
                 http_status = OK
                 request_status = '执行成功!'
-            except Exception:
+            except Exception as e:
                 http_status = BAD
-                request_status ='执行错误:文件不存在!'
+                request_status ='执行错误:日志文件可能不存在!'
+                print(e)
             return XopsResponse(request_status, status=http_status)
 
         elif request.data['excu'] == 'readlog' and request.data['scenario'] == 1:

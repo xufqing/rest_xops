@@ -365,9 +365,6 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
-    location ^~/static  {
-        alias /home/xufeng/rest_xops/static;
-    }
     location ^~/media  {
         alias /home/xufeng/rest_xops/media;
     }
