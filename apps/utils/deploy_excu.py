@@ -240,9 +240,8 @@ class DeployExcu(object):
                     if command.strip().startswith('#') or not command.strip():
                         continue
                     with connect.cd(self.target_root):
-                        pty = False if command.find('nohup') >= 0 else True
                         if self.result.exited == 0:
-                            self.result = connect.run(command, pty=pty, write=log)
+                            self.result = connect.run(command, write=log)
             connect.close()
 
     def end(self, server_ids, record_id):
@@ -284,10 +283,14 @@ class DeployExcu(object):
             for sid in serverid:
                 if sid:
                     auth_info, auth_key = auth_init(sid)
-                    connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
-                    self.do_prev_release(log, connect)
-                    self.do_release(log, connect)
-                    self.do_post_release(log, connect)
+                    if auth_info and auth_key:
+                        connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+                        self.do_prev_release(log, connect)
+                        self.do_release(log, connect)
+                        self.do_post_release(log, connect)
+                    else:
+                        send = Tailf()
+                        send.send_message(webuser, '[ERROR]服务器ID%s已被删除，部署继续执行!')
                 else:
                     send = Tailf()
                     send.send_message(webuser, '没有选择远程服务器！！！')

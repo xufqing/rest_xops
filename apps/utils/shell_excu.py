@@ -56,10 +56,10 @@ class Shell(Connection):
                     f.write(message)
             elif ws and webuser:
                 message_in = '[%s@%s]# %s' % (self.user, self.host, command)
-                message_out = stdout
                 websocket = Tailf()
                 websocket.send_message(webuser, message_in)
-                websocket.send_message(webuser, message_out)
+                for m in stdout.split('\n'):
+                    websocket.send_message(webuser, m)
             return result
         except Exception as e:
             message = '[%s@%s]%s' % (self.user, self.host, e)
@@ -73,7 +73,8 @@ class Shell(Connection):
                 message_out = '[ERROR] %s' % (str(e))
                 websocket = Tailf()
                 websocket.send_message(webuser, message_in)
-                websocket.send_message(webuser, message_out)
+                for m in message_out.split('\n'):
+                    websocket.send_message(webuser, m)
             result = Result(exited=-1, stderr=message, stdout=message)
             return result
 
