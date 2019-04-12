@@ -15,21 +15,21 @@ class Tailf(object):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(user, {"type": "user.message", 'message': message})
 
-    @async
     def local_tailf(self, logfile, webuser):
         f = open(logfile, 'rt')
         f.seek(0, 0)
         while True:
-            is_stop = gl.get_value('deploy_' + str(webuser))
             line = f.readline()
             if not line:
-                time.sleep(0.2)
-                continue
-            elif is_stop:
-                self.send_message(webuser, '[INFO]文件监视结束..')
-                f.close()
-                break
-            self.send_message(webuser, line)
+                is_stop = gl.get_value('deploy_' + str(webuser))
+                if is_stop:
+                    self.send_message(webuser, '[INFO]文件监视结束..')
+                    f.close()
+                    break
+                else:
+                    time.sleep(0.2)
+                    continue
+            yield line
 
     def remote_tail(self, host, port, user, passwd, logfile, webuser, filter_text=None):
         # 创建一个可跨文件的全局变量，控制停止
