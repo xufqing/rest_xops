@@ -4,6 +4,7 @@ from rest_framework import status
 
 # 成功
 OK = status.HTTP_200_OK
+
 NO_CONTENT = status.HTTP_204_NO_CONTENT
 # 失败
 BAD = status.HTTP_400_BAD_REQUEST

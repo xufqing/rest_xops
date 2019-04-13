@@ -1,5 +1,3 @@
-<A href="tencent://message/?uin=157793900&amp;Site=有事Q我&amp;Menu=yes">  
-<img style="border:0px;" src=http://wpa.qq.com/pa?p=1:157793900:3></a> 
 
 有问题可以联系QQ157793900 或者push issues
 

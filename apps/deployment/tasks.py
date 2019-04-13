@@ -248,7 +248,7 @@ class DeployExcu(Task):
                         continue
                     with connect.cd(self.target_root):
                         if self.result.exited == 0:
-                            self.result = connect.run(command, write=log)
+                            self.result = connect.run(command, pty=False, write=log)
             connect.close()
 
     def end(self, server_ids, record_id):
@@ -302,6 +302,7 @@ class DeployExcu(Task):
             if self.localhost:
                 # 关闭连接
                 self.localhost.close()
+            time.sleep(60)
             # 关闭local_tailf死循环
             redis.set('deploy_' + str(webuser) + '_' + str(id), '1')
 

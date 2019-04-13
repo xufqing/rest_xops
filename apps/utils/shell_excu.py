@@ -50,7 +50,7 @@ class Shell(Connection):
                 message = '[%s@%s]# %s\n[ERROR] %s' % (self.user, self.host, command, stdout + stderr)
                 error_logger.error(message)
             else:
-                message = '[%s@%s]# %s\n%s' % (self.user, self.host, command, stdout)
+                message = '[%s@%s]# %s\n%s' % (self.user, self.host, command, stdout + stderr)
             if write:
                 with open(write, 'a') as f:
                     f.write(message)
@@ -58,7 +58,8 @@ class Shell(Connection):
                 message_in = '[%s@%s]# %s' % (self.user, self.host, command)
                 websocket = Tailf()
                 websocket.send_message(webuser, message_in)
-                for m in stdout.split('\n'):
+                message_out = stdout + stderr
+                for m in message_out.split('\n'):
                     websocket.send_message(webuser, m)
             return result
         except Exception as e:

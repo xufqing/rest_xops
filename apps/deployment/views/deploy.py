@@ -256,7 +256,7 @@ class DeployView(APIView):
                 auth_info, auth_key = auth_init(host)
                 connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
                 app_start = app_start.strip().replace('&&', '').replace('||', '')
-                connect.run(app_start, ws=True, webuser=webuser)
+                aa = connect.run(app_start, ws=True, webuser=webuser)
                 connect.close()
                 http_status = OK
                 request_status = '执行成功!'

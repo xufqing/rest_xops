@@ -40,17 +40,10 @@ service.interceptors.response.use(
   response => {
     const code = response.status
     if (code < 200 || code > 300) {
-      if (code === 502) {
-        Notification.error({
-          title: '错误',
-          message: '后端服务器连接失败!'
-        })
-      } else {
-        Notification.error({
-          title: '错误',
-          message: response.detail
-        })
-      }
+      Notification.error({
+        title: '错误',
+        message: response.detail
+      })
       return Promise.reject('error')
     } else {
       return response.data
@@ -85,6 +78,11 @@ service.interceptors.response.use(
       })
     } else if (code === 403) {
       router.push({ path: '/401' })
+    } else if (code === 502) {
+      Notification.error({
+        title: '错误',
+        message: '后端服务器连接失败!'
+      })
     } else {
       const errorMsg = error.response.data.detail
       if (errorMsg !== undefined) {

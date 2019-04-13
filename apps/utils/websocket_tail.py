@@ -27,7 +27,7 @@ class Tailf(object):
                     f.close()
                     break
                 else:
-                    time.sleep(0.2)
+                    time.sleep(0.1)
                     continue
             yield line
 
