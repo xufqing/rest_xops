@@ -8,10 +8,35 @@ from utils.shell_excu import Shell, auth_init
 from utils.common import includes_format, excludes_format
 from utils.websocket_tail import Tailf
 from django.conf import settings
-import os, time
+import os, time, logging
 from celery import Task
 from rest_xops.celery import app
 from common.custom import RedisObj
+
+error_logger = logging.getLogger('error')
+info_logger = logging.getLogger('info')
+
+
+@app.task
+def local_tailf(logfile, webuser, id):
+    info_logger.info('[部署日志监控开始] 文件地址：%s 用户：%s 项目ID：%s' % (logfile, webuser, id))
+    redis = RedisObj()
+    f = open(logfile, 'rt')
+    f.seek(0, 0)
+    while True:
+        line = f.readline()
+        if not line:
+            is_stop = redis.get('deploy_' + str(webuser) + '_' + str(id))
+            if is_stop == '1':
+                Tailf.send_message(webuser, '[INFO]文件监视结束..')
+                f.close()
+                info_logger.info('[部署日志监控结束] 文件地址：%s 用户：%s 项目ID：%s' % (logfile, webuser, id))
+                break
+            else:
+                time.sleep(0.2)
+                continue
+        Tailf.send_message(webuser, line)
+
 
 class DeployExcu(Task):
     name = __name__
@@ -187,7 +212,7 @@ class DeployExcu(Task):
             # 解压并删除压缩源
             with connect.cd(target_release_version):
                 command = 'tar xf %s && rm -f %s' % \
-                          (self.release_version + '.tar',self.release_version + '.tar')
+                          (self.release_version + '.tar', self.release_version + '.tar')
                 if self.result.exited == 0:
                     self.result = connect.run(command, write=log)
 
@@ -248,7 +273,7 @@ class DeployExcu(Task):
                         continue
                     with connect.cd(self.target_root):
                         if self.result.exited == 0:
-                            self.result = connect.run(command, pty=False, write=log)
+                            self.result = connect.run(command, write=log)
             connect.close()
 
     def end(self, server_ids, record_id):
@@ -274,9 +299,11 @@ class DeployExcu(Task):
             Project.objects.filter(id=self.project_id).update(last_task_status='Failed')
 
     def run(self, id, log, version, serverid, record_id, webuser, start_time):
+        info_logger.info(
+            '[部署任务开始] 开始时间：%s 记录ID：%s 部署版本：%s 用户：%s 项目ID：%s' % (start_time, record_id, version, webuser, id))
         redis = RedisObj()
         redis.set('deploy_' + str(webuser) + '_' + str(id), '0')
-        self.init(webuser,record_id,id)
+        self.init(webuser, record_id, id)
         self.start_time = start_time
         with open(log, 'a') as f:
             f.write('[INFO]版本: %s 执行用户: %s 开始时间: %s\n[INFO]本次部署日志路径: %s\n' % (version, webuser, start_time, log))
@@ -292,18 +319,23 @@ class DeployExcu(Task):
                     self.do_release(log, connect)
                     self.do_post_release(log, connect)
                 except Exception as e:
-                        time.sleep(10)
-                        Tailf.send_message(webuser, '[ERROR] 服务器为空或ID %s 可能已被删除!' % sid)
-                        Tailf.send_message(webuser, '[ERROR] 错误信息:' % e)
+                    time.sleep(20)
+                    Tailf.send_message(webuser, '[ERROR] 服务器为空或ID %s 可能已被删除!' % sid)
+                    Tailf.send_message(webuser, '[ERROR] 错误信息:' % e)
+                    error_logger.error('[部署任务错误] 开始时间：%s 记录ID：%s 部署版本：%s 用户：%s 项目ID：%s 信息：%s' % (
+                    start_time, record_id, version, webuser, id, e))
             self.end(serverid, record_id)
+            info_logger.info('[部署任务已结束] 记录ID：%s 部署版本：%s 用户：%s 项目ID：%s' % (record_id, version, webuser, id))
         except Exception as e:
             Tailf.send_message(webuser, '[ERROR] 错误信息:' % e)
+            error_logger.error('[部署任务错误] 开始时间：%s 记录ID：%s 部署版本：%s 用户：%s 项目ID：%s 信息：%s' % (
+            start_time, record_id, version, webuser, id, e))
         finally:
             if self.localhost:
                 # 关闭连接
                 self.localhost.close()
-            time.sleep(60)
             # 关闭local_tailf死循环
             redis.set('deploy_' + str(webuser) + '_' + str(id), '1')
+
 
 deploy = app.register_task(DeployExcu())

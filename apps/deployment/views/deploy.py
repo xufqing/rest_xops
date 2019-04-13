@@ -18,6 +18,7 @@ from ..tasks import deploy
 from common.custom import RedisObj
 from django.conf import settings
 from django.http import FileResponse
+from ..tasks import local_tailf
 
 
 error_logger = logging.getLogger('error')
@@ -220,11 +221,8 @@ class DeployView(APIView):
                 scenario = int(request.data['scenario'])
                 logfile = self._path.rstrip('/') + '/' + str(id) + '_' + str(alias) + '/logs/' + record + '.log'
                 webuser = request.user.username
-                msg = Tailf()
                 if scenario == 0:
-                    logs = msg.local_tailf(logfile,webuser,id)
-                    for m in logs:
-                        msg.send_message(webuser, m)
+                    local_tailf.delay(logfile,webuser,id)
                 http_status = OK
                 request_status = '执行成功!'
             except Exception as e:
@@ -256,7 +254,7 @@ class DeployView(APIView):
                 auth_info, auth_key = auth_init(host)
                 connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
                 app_start = app_start.strip().replace('&&', '').replace('||', '')
-                aa = connect.run(app_start, ws=True, webuser=webuser)
+                connect.run(app_start, ws=True, webuser=webuser)
                 connect.close()
                 http_status = OK
                 request_status = '执行成功!'

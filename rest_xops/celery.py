@@ -23,7 +23,7 @@ CELERY_ENABLE_UTC = False
 
 CELERYD_FORCE_EXECV = True # 防止任务死锁
 
-CELERYD_CONCURRENCY = 5 # 并发的worker数量
+CELERYD_CONCURRENCY = 8 # 并发的worker数量
 
 CELERY_ACKS_LATE = True
 

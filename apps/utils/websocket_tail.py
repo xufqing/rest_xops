@@ -14,23 +14,6 @@ class Tailf(object):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(user, {"type": "user.message", 'message': message})
 
-    def local_tailf(self, logfile, webuser, id):
-        redis = RedisObj()
-        f = open(logfile, 'rt')
-        f.seek(0, 0)
-        while True:
-            line = f.readline()
-            if not line:
-                is_stop = redis.get('deploy_' + str(webuser) + '_' + str(id))
-                if is_stop == '1':
-                    self.send_message(webuser, '[INFO]文件监视结束..')
-                    f.close()
-                    break
-                else:
-                    time.sleep(0.1)
-                    continue
-            yield line
-
     def get_is_stop(self, webuser):
         redis = RedisObj()
         is_stop = redis.get('remote_tail_' + str(webuser))
