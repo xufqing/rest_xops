@@ -6,7 +6,7 @@ from rest_xops.code import *
 from rest_xops.basic import XopsResponse
 from ..models import Project, DeployRecord
 from cmdb.models import DeviceInfo, ConnectionInfo
-from utils.shell_excu import Shell,auth_init
+from utils.shell_excu import Shell, auth_init
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 import os, logging, time
 from common.custom import CommonPagination, RbacPermission
@@ -14,10 +14,11 @@ from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from ..serializers.project_serializer import DeployRecordSerializer
 from utils.websocket_tail import Tailf
-from utils.deploy_excu import DeployExcu
+from ..tasks import deploy
 import utils.globalvar as gl
 from django.conf import settings
 from django.http import FileResponse
+
 
 error_logger = logging.getLogger('error')
 info_logger = logging.getLogger('info')
@@ -36,6 +37,7 @@ class DeployRecordViewSet(ReadOnlyModelViewSet):
     ordering_fields = ('id',)
     authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (RbacPermission,)
+
 
 class VersionView(APIView):
     perms_map = ({'*': 'admin'}, {'*': 'deploy_all'}, {'get': 'deploy_excu'})
@@ -127,7 +129,7 @@ class DeployView(APIView):
                     self.result = connect.run(command, write=log)
                     # 创建需回滚版本软链到webroot
                     command = 'ln -sfn %s/%s/* %s' % (
-                    record[0]['target_releases'], record[0]['prev_record'], record[0]['target_root'])
+                        record[0]['target_releases'], record[0]['prev_record'], record[0]['target_root'])
                     if self.result.exited == 0: self.result = connect.run(command, write=log)
                     command = 'echo %s > %s' % (record[0]['prev_record'], version_file)
                     if self.result.exited == 0: self.result = connect.run(command, write=log)
@@ -145,7 +147,7 @@ class DeployView(APIView):
             'target_root': record[0]['target_root'],
             'target_releases': record[0]['target_releases'],
             'prev_record': record[0]['record_id'],
-            'is_rollback':True,
+            'is_rollback': True,
             'status': 'Succeed'
         }
         if self.result.exited != 0 or self.result.stdout.strip() == 'false':
@@ -176,7 +178,7 @@ class DeployView(APIView):
             else:
                 error_logger.error('初始化项目:%s 执行失败! 错误信息:%s' % (str(id), result.stderr))
                 http_status = BAD
-                msg ='初始化项目:%s 执行失败! 错误信息:%s' % (str(id), result.stderr)
+                msg = '初始化项目:%s 执行失败! 错误信息:%s' % (str(id), result.stderr)
 
             return XopsResponse(msg, status=http_status)
 
@@ -188,14 +190,14 @@ class DeployView(APIView):
             self.start_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
             record_id = str(alias) + '_' + str(self.start_time)
             name = '部署_' + record_id
-            DeployRecord.objects.create(name=name, alias=alias ,status='Failed', project_id=int(id))
+            DeployRecord.objects.create(name=name, alias=alias, status='Failed', project_id=int(id))
             Project.objects.filter(id=id).update(last_task_status='Failed')
             local_log_path = self._path.rstrip('/') + '/' + str(id) + '_' + str(request.data['alias']) + '/logs'
             log = local_log_path + '/' + record_id + '.log'
             version = request.data['version'].strip()
             serverid = request.data['server_ids']
-            deploy = DeployExcu(webuser,record_id,id)
-            deploy.start(log,version,serverid,record_id,webuser,self.start_time )
+            # 调用celery异步任务
+            deploy.delay(id,log,version,serverid,record_id,webuser,self.start_time)
             return XopsResponse(record_id)
 
         elif request.data['excu'] == 'rollback':
@@ -218,18 +220,16 @@ class DeployView(APIView):
                 scenario = int(request.data['scenario'])
                 logfile = self._path.rstrip('/') + '/' + str(id) + '_' + str(alias) + '/logs/' + record + '.log'
                 webuser = request.user.username
-                print(webuser)
                 msg = Tailf()
                 if scenario == 0:
-                    logs = msg.local_tailf(logfile, webuser)
+                    logs = msg.local_tailf(logfile)
                     for m in logs:
-                        msg.send_message(webuser,m)
+                        msg.send_message(webuser, m)
                 http_status = OK
                 request_status = '执行成功!'
             except Exception as e:
                 http_status = BAD
-                request_status ='执行错误:日志文件可能不存在!'
-                print(e)
+                request_status = str(e)
             return XopsResponse(request_status, status=http_status)
 
         elif request.data['excu'] == 'readlog' and request.data['scenario'] == 1:
@@ -244,7 +244,7 @@ class DeployView(APIView):
                 return response
             except Exception:
                 http_status = BAD
-                request_status ='执行错误:文件不存在!'
+                request_status = '执行错误:文件不存在!'
             return XopsResponse(request_status, status=http_status)
 
         elif request.data['excu'] == 'app_start':

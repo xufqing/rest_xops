@@ -4,7 +4,6 @@ import paramiko, logging, time
 from paramiko_expect import SSHClientInteraction
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from utils.common import async
 import utils.globalvar as gl
 
 info_logger = logging.getLogger('info')
@@ -15,20 +14,14 @@ class Tailf(object):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(user, {"type": "user.message", 'message': message})
 
-    def local_tailf(self, logfile, webuser):
+    def local_tailf(self, logfile):
         f = open(logfile, 'rt')
         f.seek(0, 0)
         while True:
             line = f.readline()
             if not line:
-                is_stop = gl.get_value('deploy_' + str(webuser))
-                if is_stop:
-                    self.send_message(webuser, '[INFO]文件监视结束..')
-                    f.close()
-                    break
-                else:
-                    time.sleep(0.2)
-                    continue
+                time.sleep(0.3)
+                continue
             yield line
 
     def remote_tail(self, host, port, user, passwd, logfile, webuser, filter_text=None):

@@ -4,13 +4,13 @@ from celery import Celery
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rest_xops.settings') # 设置django环境
 
-app = Celery('xops')
+app = Celery('rest_xops')
 
 app.config_from_object('django.conf:settings')
 
 app.autodiscover_tasks() # 自动发现task，这个配置会自动从每个app目录下去发现tasks.py文件
 
-# 以下内容也可以写在settings.py文件中 
+# 以下内容也可以写在settings.py文件中
 
 BROKER_URL = 'redis://localhost:16379/1' # Broker配置，使用Redis作为消息中间件
 

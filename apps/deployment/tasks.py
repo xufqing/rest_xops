@@ -1,18 +1,20 @@
+# @Time    : 2019/4/13 8:22
+# @Author  : xufqing
 # @Time    : 2019/3/22 13:42
 # @Author  : xufqing
 
 from deployment.models import Project, DeployRecord
 from utils.shell_excu import Shell, auth_init
-from utils.common import includes_format, excludes_format, async
+from utils.common import includes_format, excludes_format
 import utils.globalvar as gl
 from utils.websocket_tail import Tailf
 from django.conf import settings
-import os, asyncio
+import os
+from celery import Task
+from rest_xops.celery import app
 
-
-
-
-class DeployExcu(object):
+class DeployExcu(Task):
+    name = __name__
     _path = settings.WORKSPACE
     sequence = 0
     release_version = None
@@ -21,7 +23,7 @@ class DeployExcu(object):
     file = None
     start_time = None
 
-    def __init__(self, webuser, record_id, id=None):
+    def init(self, webuser, record_id, id=None):
         self.localhost = Shell('127.0.0.1')
         if id:
             project = Project.objects.filter(id=int(id)).values()
@@ -270,13 +272,12 @@ class DeployExcu(object):
             defaults['is_rollback'] = False
             DeployRecord.objects.filter(name=name).update(**defaults)
             Project.objects.filter(id=self.project_id).update(last_task_status='Failed')
-    @async
-    def start(self, log, version, serverid, record_id, webuser, start_time):
-        gl._init()
-        gl.set_value('deploy_' + str(webuser), False)
+
+    def run(self, id, log, version, serverid, record_id, webuser, start_time):
+        self.init(webuser,record_id,id)
         self.start_time = start_time
         with open(log, 'a') as f:
-            f.write('[INFO]版本: %s 执行用户: %s 开始时间: %s\n[INFO]本次部署日志路径: %s\n' % (version,webuser,start_time,log))
+            f.write('[INFO]版本: %s 执行用户: %s 开始时间: %s\n[INFO]本次部署日志路径: %s\n' % (version, webuser, start_time, log))
         try:
             self.do_prev_deploy(log)
             self.do_checkout(version, log)
@@ -300,5 +301,5 @@ class DeployExcu(object):
             if self.localhost:
                 # 关闭连接
                 self.localhost.close()
-            # 关闭死循环读取本地日志
-            gl.set_value('deploy_' + str(self.webuser), True)
+
+deploy = app.register_task(DeployExcu())

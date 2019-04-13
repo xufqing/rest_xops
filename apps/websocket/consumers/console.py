@@ -25,14 +25,11 @@ class ConsoleMsgConsumer(AsyncWebsocketConsumer):
         )
 
     async def disconnect(self, code):
-        # 关闭死循环读取日志
+        # 判断远程读取日志关闭连接
         webuser = self.scope['user'].username
         if hasattr(gl,'_global_dict'):
-            deploy_key = 'deploy_' + str(webuser)
             tail_key = 'tail_' + str(webuser)
-            if deploy_key in gl._global_dict.keys():
-                gl.set_value(deploy_key, True)
-            elif tail_key in gl._global_dict.keys():
+            if tail_key in gl._global_dict.keys():
                 client = gl.get_value(tail_key)
                 client.close()
 

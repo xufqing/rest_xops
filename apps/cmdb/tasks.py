@@ -1,15 +1,14 @@
 # @Time    : 2019/2/19 14:42
 # @Author  : xufqing
 import time, logging
-from celery import shared_task
 from utils.common import ScanSettingsLoad
 from utils.shell_excu import Shell
 from .models import DeviceScanInfo
-
+from rest_xops.celery import app
 info_logger = logging.getLogger('info')
 
 
-@shared_task()
+@app.task
 def scan_execution():
     scan_settings_load = ScanSettingsLoad()
     start_time = time.time()
