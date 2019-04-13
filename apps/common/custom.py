@@ -144,9 +144,6 @@ class RedisObj(object):
                  password=settings.REDIS_PASSWORD):
         try:
             self.__conn = redis.StrictRedis(host=host, port=port, db=db, password=password,decode_responses=True)
-            msg = '连接Redis成功!'
-            info_logger.info(msg)
-            print(msg)
         except Exception as e:
             msg = 'Redis连接失败，错误信息：%s' % e
             error_logger.error(msg)

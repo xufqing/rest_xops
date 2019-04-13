@@ -80,7 +80,7 @@ export default {
   },
   beforeDestroy: function() {
     if (this.$route.query.scenario === 0) {
-      this.vm.$disconnect()
+      this.vm.$disconnect(this.$route.query.id)
       console.log('---离开页面关闭Websocket---')
     }
   },

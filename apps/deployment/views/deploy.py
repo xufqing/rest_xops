@@ -15,7 +15,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from ..serializers.project_serializer import DeployRecordSerializer
 from utils.websocket_tail import Tailf
 from ..tasks import deploy
-import utils.globalvar as gl
+from common.custom import RedisObj
 from django.conf import settings
 from django.http import FileResponse
 
@@ -310,11 +310,8 @@ class DeployView(APIView):
             # 日志监控停止
             try:
                 webuser = request.user.username
-                if hasattr(gl, '_global_dict'):
-                    tail_key = 'tail_' + str(webuser)
-                    if tail_key in gl._global_dict.keys():
-                        client = gl.get_value('tail_' + str(webuser))
-                        client.close()
+                redis = RedisObj()
+                redis.set('remote_tail_' + str(webuser), '1')
                 http_status = OK
                 request_status = '执行成功!'
             except Exception as e:

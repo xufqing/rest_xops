@@ -19,6 +19,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_xops.settings import SECRET_KEY
 from operator import itemgetter
 from rest_xops.code import *
+from deployment.models import Project
+from cmdb.models import ConnectionInfo
+from django.db.models import Q
 import jwt
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
@@ -314,6 +317,22 @@ class UserViewSet(ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return XopsResponse(serializer.data, status=CREATED, headers=headers)
+
+    def destroy(self, request, *args, **kwargs):
+        # 删除用户时删除其他表关联的用户
+        instance = self.get_object()
+        id = str(kwargs['pk'])
+        projects = Project.objects.filter(
+            Q(user_id__icontains=id + ',') | Q(user_id__in=id) | Q(user_id__endswith=',' + id)).values()
+        if projects:
+            for project in projects:
+                user_id = project['user_id'].split(',')
+                user_id.remove(id)
+                user_id = ','.join(user_id)
+                Project.objects.filter(id=project['id']).update(user_id=user_id)
+        ConnectionInfo.objects.filter(uid_id=id).delete()
+        self.perform_destroy(instance)
+        return XopsResponse(status=NO_CONTENT)
 
     @action(methods=['post'], detail=True, permission_classes=[IsAuthenticated],
             url_path='change-passwd', url_name='change-passwd')

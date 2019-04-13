@@ -376,19 +376,20 @@ textarea {
 .lock {
   position: fixed;
   right: 45px;
-  bottom: 6.8%;
+  bottom: 2%;
   z-index: 100000;
 }
 .closepage {
+  margin: 80px;
   position: fixed;
-  right: 45px;
-  bottom: 17.5%;
-  z-index: 100000;
+  right: -35px;
+  bottom: 0%;
 }
 .clean {
+  margin: 40px;
   position: fixed;
-  right: 45px;
-  bottom: 12%;
+  right: 5px;
+  bottom: 1%;
   z-index: 100000;
 }
 </style>

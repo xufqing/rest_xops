@@ -28,7 +28,7 @@
             :ref="scope.row.id"
             placement="top"
             width="180">
-            <p>确定删除本条数据吗？</p>
+            <p>确定删除本条数据吗？所有关联的数据将会被清除</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="$refs[scope.row.id].doClose()">取消</el-button>
               <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.id)">确定</el-button>

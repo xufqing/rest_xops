@@ -88,7 +88,7 @@ export default {
       formloading: false,
       rollbackloading: false,
       changeFlag: false,
-      vers: [],
+      vers: null,
       host_radio: 'true',
       hosts: [],
       records: [],
@@ -212,18 +212,20 @@ export default {
     },
     getVersion: function(callback, id) {
       if (callback) {
-        this.changeFlag = true
-        getVers(id).then(res => {
-          this.vers = []
-          const _this = this
-          res.detail.forEach(function(data, index) {
-            _this.vers.push({
-              id: index,
-              value: data
+        if (this.vers === null) {
+          this.changeFlag = true
+          getVers(id).then(res => {
+            const _this = this
+            _this.vers = []
+            res.detail.forEach(function(data, index) {
+              _this.vers.push({
+                id: index,
+                value: data
+              })
             })
+            this.changeFlag = false
           })
-          this.changeFlag = false
-        })
+        }
       }
     }
   }

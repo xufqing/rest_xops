@@ -29,12 +29,12 @@ export default {
   data() {
     return {
       myBackToTopStyle: {
-        right: '50px',
-        bottom: '50px',
-        width: '45px',
-        height: '45px',
+        right: '4px',
+        bottom: '20px',
+        width: '35px',
+        height: '35px',
         'border-radius': '4px',
-        'line-height': '45px', // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
+        'line-height': '35px', // 请保持与高度一致以垂直居中 Please keep consistent with height to center vertically
         background: '#e7eaf1'// 按钮的背景颜色 The background color of the button
       }
     }

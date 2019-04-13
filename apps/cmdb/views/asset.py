@@ -9,6 +9,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from ..models import DeviceInfo
+from deployment.models import Project
+from rest_xops.basic import XopsResponse
+from rest_xops.code import *
+from django.db.models import Q
 
 
 class DeviceInfoViewSet(ModelViewSet):
@@ -16,8 +20,8 @@ class DeviceInfoViewSet(ModelViewSet):
     字典管理：增删改查
     '''
     perms_map = (
-    {'*': 'admin'}, {'*': 'device_all'}, {'get': 'device_list'}, {'post': 'device_create'}, {'put': 'device_edit'},
-    {'delete': 'device_delete'})
+        {'*': 'admin'}, {'*': 'device_all'}, {'get': 'device_list'}, {'post': 'device_create'}, {'put': 'device_edit'},
+        {'delete': 'device_delete'})
     queryset = DeviceInfo.objects.all()
     serializer_class = DeviceInfoSerializer
     pagination_class = CommonPagination
@@ -34,6 +38,22 @@ class DeviceInfoViewSet(ModelViewSet):
             return DeviceInfoListSerializer
         return DeviceInfoSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        # 删除其他关联资产的数据
+        instance = self.get_object()
+        id = str(kwargs['pk'])
+        projects = Project.objects.filter(
+            Q(server_ids__icontains=id + ',') | Q(server_ids__in=id) | Q(server_ids__endswith=',' + id)).values()
+        if projects:
+            for project in projects:
+                server_ids = project['server_ids'].split(',')
+                server_ids.remove(id)
+                server_ids = ','.join(server_ids)
+                Project.objects.filter(id=project['id']).update(server_ids=server_ids)
+        self.perform_destroy(instance)
+
+        return XopsResponse(status=NO_CONTENT)
+
 
 class DeviceListView(ListAPIView):
     queryset = DeviceInfo.objects.all()
@@ -43,4 +63,3 @@ class DeviceListView(ListAPIView):
     ordering_fields = ('id',)
     authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-

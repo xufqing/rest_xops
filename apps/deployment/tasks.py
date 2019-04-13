@@ -8,7 +8,7 @@ from utils.shell_excu import Shell, auth_init
 from utils.common import includes_format, excludes_format
 from utils.websocket_tail import Tailf
 from django.conf import settings
-import os
+import os, time
 from celery import Task
 from rest_xops.celery import app
 from common.custom import RedisObj
@@ -285,20 +285,19 @@ class DeployExcu(Task):
             self.do_checkout(version, log)
             self.do_post_deploy(log)
             for sid in serverid:
-                if sid:
+                try:
                     auth_info, auth_key = auth_init(sid)
-                    if auth_info and auth_key:
-                        connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
-                        self.do_prev_release(log, connect)
-                        self.do_release(log, connect)
-                        self.do_post_release(log, connect)
-                    else:
-                        Tailf.send_message(webuser, '[ERROR]服务器ID%s已被删除，部署继续执行!' % sid)
-                else:
-                    Tailf.send_message(webuser, '没有选择远程服务器！！！')
+                    connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+                    self.do_prev_release(log, connect)
+                    self.do_release(log, connect)
+                    self.do_post_release(log, connect)
+                except Exception as e:
+                        time.sleep(10)
+                        Tailf.send_message(webuser, '[ERROR] 服务器为空或ID %s 可能已被删除!' % sid)
+                        Tailf.send_message(webuser, '[ERROR] 错误信息:' % e)
             self.end(serverid, record_id)
         except Exception as e:
-            Tailf.send_message(webuser, str(e))
+            Tailf.send_message(webuser, '[ERROR] 错误信息:' % e)
         finally:
             if self.localhost:
                 # 关闭连接

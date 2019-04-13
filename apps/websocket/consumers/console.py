@@ -2,7 +2,7 @@
 # @Author  : xufqing
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-import utils.globalvar as gl
+from common.custom import RedisObj
 
 class ConsoleMsgConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -25,13 +25,12 @@ class ConsoleMsgConsumer(AsyncWebsocketConsumer):
         )
 
     async def disconnect(self, code):
-        # 判断远程读取日志关闭连接
+        # 关闭远程tail
         webuser = self.scope['user'].username
-        if hasattr(gl,'_global_dict'):
-            tail_key = 'tail_' + str(webuser)
-            if tail_key in gl._global_dict.keys():
-                client = gl.get_value(tail_key)
-                client.close()
+        redis = RedisObj()
+        remote_tail_is_stop = redis.get('remote_tail_' + str(webuser))
+        if remote_tail_is_stop == '0':
+            redis.set('remote_tail_' + str(webuser), '1')
 
         await self.channel_layer.group_discard(
             webuser,
