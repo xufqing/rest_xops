@@ -1,3 +1,8 @@
+<A href="tencent://message/?uin=157793900&amp;Site=有事Q我&amp;Menu=yes">  
+<img style="border:0px;" src=http://wpa.qq.com/pa?p=1:157793900:3></a> 
+
+有问题可以联系QQ157793900 或者push issues
+
 demo地址: http://demo.xufqing.cn
 
 管理员账号:admin 密码admin@1234
@@ -67,7 +72,7 @@ MySql 5.6.42
 
 CentOS 7
 
-***系统更新方式（测试）***
+***系统更新方式***
 ```
 cd 你的项目地址
 sh upgrade.sh
@@ -231,6 +236,7 @@ autostart=true
 autorestart=true
 priority=901
 
+#flower是celery的监控，请注意修改redis连接
 [program:celery-flower]
 command=/home/xufeng/.pyenv/versions/rest_xops/bin/celery flower --broker=redis://localhost:6379/1
 directory=/home/xufeng/rest_xops
@@ -286,7 +292,7 @@ stdout_logfile=/var/log/rest_xops/xops.log
 stderr_logfile=/var/log/rest_xops/xops.log
 stdout_logfile_maxbytes = 20MB
 autostart=true
-autorestart=true
+autorestart=false
 ```
 - xops_asgi
 ```
