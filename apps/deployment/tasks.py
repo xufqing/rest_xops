@@ -6,12 +6,12 @@
 from deployment.models import Project, DeployRecord
 from utils.shell_excu import Shell, auth_init
 from utils.common import includes_format, excludes_format
-import utils.globalvar as gl
 from utils.websocket_tail import Tailf
 from django.conf import settings
 import os
 from celery import Task
 from rest_xops.celery import app
+from common.custom import RedisObj
 
 class DeployExcu(Task):
     name = __name__
@@ -274,6 +274,8 @@ class DeployExcu(Task):
             Project.objects.filter(id=self.project_id).update(last_task_status='Failed')
 
     def run(self, id, log, version, serverid, record_id, webuser, start_time):
+        redis = RedisObj()
+        redis.set('deploy_' + str(webuser) + '_' + str(id), '0')
         self.init(webuser,record_id,id)
         self.start_time = start_time
         with open(log, 'a') as f:
@@ -301,5 +303,7 @@ class DeployExcu(Task):
             if self.localhost:
                 # 关闭连接
                 self.localhost.close()
+            # 关闭local_tailf死循环
+            redis.set('deploy_' + str(webuser) + '_' + str(id), '1')
 
 deploy = app.register_task(DeployExcu())

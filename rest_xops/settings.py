@@ -131,12 +131,18 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=3),
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
+# redis 设置
+REDIS_HOST = 'localhost'
+REDIS_PORT = 16379
+REDIS_DB = 0
+REDIS_PASSWORD = None
+
 # django-channels配置
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 16379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
@@ -172,6 +178,7 @@ WORKSPACE = '/tmp/workspace/'
 
 # 日志
 BASE_LOG_DIR = os.path.join(BASE_DIR, 'logs')
+
 
 LOGGING = {
     'version': 1,

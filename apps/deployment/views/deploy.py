@@ -222,7 +222,7 @@ class DeployView(APIView):
                 webuser = request.user.username
                 msg = Tailf()
                 if scenario == 0:
-                    logs = msg.local_tailf(logfile)
+                    logs = msg.local_tailf(logfile,webuser,id)
                     for m in logs:
                         msg.send_message(webuser, m)
                 http_status = OK

@@ -5,6 +5,7 @@ from paramiko_expect import SSHClientInteraction
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import utils.globalvar as gl
+from common.custom import RedisObj
 
 info_logger = logging.getLogger('info')
 
@@ -14,14 +15,21 @@ class Tailf(object):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(user, {"type": "user.message", 'message': message})
 
-    def local_tailf(self, logfile):
+    def local_tailf(self, logfile, webuser, id):
+        redis = RedisObj()
         f = open(logfile, 'rt')
         f.seek(0, 0)
         while True:
             line = f.readline()
             if not line:
-                time.sleep(0.3)
-                continue
+                is_stop = redis.get('deploy_' + str(webuser) + '_' + str(id))
+                if is_stop == '1':
+                    self.send_message(webuser, '[INFO]文件监视结束..')
+                    f.close()
+                    break
+                else:
+                    time.sleep(0.2)
+                    continue
             yield line
 
     def remote_tail(self, host, port, user, passwd, logfile, webuser, filter_text=None):

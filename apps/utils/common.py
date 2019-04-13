@@ -3,7 +3,6 @@
 
 import os, yaml, logging, nmap
 from django.conf import settings
-from threading import Thread
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rest_xops.settings')
 error_logger = logging.getLogger('error')
@@ -105,9 +104,3 @@ def includes_format(path, includes_string=None):
         return path
 
     return includes
-
-def async(f):
-    def wrapper(*args, **kwargs):
-        thr = Thread(target = f, args = args, kwargs = kwargs)
-        thr.start()
-    return wrapper
