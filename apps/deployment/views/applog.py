@@ -5,7 +5,7 @@ from rest_xops.basic import XopsResponse
 from rest_xops.code import *
 from common.custom import RbacPermission
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from utils.shell_excu import Shell, connect_init
+from utils.shell_excu import connect_init
 from django.http import FileResponse
 from rest_framework.renderers import BaseRenderer
 import os

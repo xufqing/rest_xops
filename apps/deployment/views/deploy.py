@@ -20,7 +20,6 @@ from django.conf import settings
 from django.http import FileResponse
 from ..tasks import local_tailf
 
-
 error_logger = logging.getLogger('error')
 info_logger = logging.getLogger('info')
 
@@ -112,7 +111,7 @@ class DeployView(APIView):
         '''
         sequence = 1
         with open(log, 'a') as f:
-            f.write('[INFO]------正在执行回滚[%s]------\n' % (sequence))
+            f.write('[INFO]------正在执行回滚 [%s]------\n' % (sequence))
         record = DeployRecord.objects.filter(id=int(id)).values()
         server_ids = record[0]['server_ids'].split(',')
         name = '回滚_' + str(id) + '_' + record_id
@@ -133,6 +132,8 @@ class DeployView(APIView):
                     if self.result.exited == 0: self.result = connect.run(command, write=log)
                     command = 'echo %s > %s' % (record[0]['prev_record'], version_file)
                     if self.result.exited == 0: self.result = connect.run(command, write=log)
+                    with open(log, 'a') as f:
+                        f.write('[INFO]------版本已回滚到 [%s]------\n' % (record[0]['prev_record']))
                 connect.close()
             except Exception as e:
                 error_logger.error(e)
@@ -197,8 +198,7 @@ class DeployView(APIView):
             version = request.data['version'].strip()
             serverid = request.data['server_ids']
             # 调用celery异步任务
-            deploy.delay(id,log,version,serverid,record_id,webuser,self.start_time)
-            #deploy.run(id, log, version, serverid, record_id, webuser, self.start_time)
+            deploy.delay(id, log, version, serverid, record_id, webuser, self.start_time)
             return XopsResponse(record_id)
 
         elif request.data['excu'] == 'rollback':
@@ -222,7 +222,7 @@ class DeployView(APIView):
                 logfile = self._path.rstrip('/') + '/' + str(id) + '_' + str(alias) + '/logs/' + record + '.log'
                 webuser = request.user.username
                 if scenario == 0:
-                    local_tailf.delay(logfile,webuser,id)
+                    local_tailf.delay(logfile, webuser, id)
                 http_status = OK
                 request_status = '执行成功!'
             except Exception as e:
@@ -253,7 +253,7 @@ class DeployView(APIView):
                 webuser = request.user.username
                 connect = connect_init(host)
                 app_start = app_start.strip().replace('&&', '').replace('||', '')
-                connect.run(app_start, ws=True, webuser=webuser)
+                connect.run(app_start, webuser=webuser)
                 connect.close()
                 http_status = OK
                 request_status = '执行成功!'
@@ -270,7 +270,7 @@ class DeployView(APIView):
                 webuser = request.user.username
                 connect = connect_init(host)
                 app_stop = app_stop.strip().replace('&&', '').replace('||', '')
-                connect.run(app_stop, ws=True, webuser=webuser)
+                connect.run(app_stop, webuser=webuser)
                 connect.close()
                 http_status = OK
                 request_status = '执行成功!'

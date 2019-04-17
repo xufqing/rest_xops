@@ -33,29 +33,28 @@ class Shell(Connection):
     run_mode_remote = 'remote'
     run_mode_local = 'local'
     custom_global_env = {}
-    file = None
 
     def init_env(self, **kwargs):
         self.custom_global_env = kwargs['env']
 
-    def run(self, command, run_mode=run_mode_remote, write=None, pty=False, exception=True, ws=False, webuser=None, **kwargs):
+    def run(self, command, run_mode=run_mode_remote, write=None, pty=False, webuser=None, **kwargs):
         try:
             if write:
                 message = '[%s@%s]# %s\n' % (self.user, self.host, command)
-                self.file = open(write, 'a')
-                self.file.write(message)
-                sys.stdout = sys.stderr = self.file
+                file = open(write, 'a')
+                file.write(message)
+                sys.stdout = sys.stderr = file
             if run_mode == self.run_mode_local:
-                result = super(Shell, self).local(command, pty=pty, echo_stdin=True, warn=True, watchers=[say_yes()],
+                result = super(Shell, self).local(command, pty=pty, warn=True, watchers=[say_yes()],
                                                   env=self.custom_global_env, **kwargs)
             else:
-                result = super(Shell, self).run(command, pty=pty, echo_stdin=True,warn=True, watchers=[say_yes()],
+                result = super(Shell, self).run(command, pty=pty,warn=True, watchers=[say_yes()],
                                                 env=self.custom_global_env, **kwargs)
             exited, stdout, stderr = result.exited, result.stdout, result.stderr
             if result.failed:
                 message = '[%s@%s]# %s\n[ERROR] %s' % (self.user, self.host, command,stdout + stdout)
                 error_logger.error(message)
-            if ws and webuser:
+            if webuser:
                 message_in = '[%s@%s]# %s' % (self.user, self.host, command)
                 websocket = Tailf()
                 websocket.send_message(webuser, message_in)
@@ -70,7 +69,7 @@ class Shell(Connection):
             if write:
                 with open(write, 'a') as f:
                     f.write(message)
-            elif ws and webuser:
+            elif webuser:
                 message_in = '[%s@%s]# %s' % (self.user, self.host, command)
                 message_out = '[ERROR] %s' % (str(e))
                 Tailf.send_message(webuser, message_in)
@@ -79,16 +78,16 @@ class Shell(Connection):
             result = Result(exited=-1, stderr=message, stdout=message)
             return result
 
-    def local(self, command, write=None, ws=False, webuser=None, **kwargs):
-        return self.run(command, run_mode=self.run_mode_local, write=write, ws=ws, webuser=webuser, **kwargs)
+    def local(self, command, write=None, webuser=None, **kwargs):
+        return self.run(command, run_mode=self.run_mode_local, write=write, webuser=webuser, **kwargs)
 
-    def get(self, remote=None, local=None, write=None, ws=False, webuser=None):
-        return self.sync(wtype='get', remote=remote, local=local, write=write, ws=ws, webuser=webuser)
+    def get(self, remote=None, local=None, write=None, webuser=None):
+        return self.sync(wtype='get', remote=remote, local=local, write=write, webuser=webuser)
 
-    def put(self, local, remote=None, write=None, ws=False, webuser=None):
-        return self.sync(wtype='put', local=local, remote=remote, write=write, ws=ws, webuser=webuser)
+    def put(self, local, remote=None, write=None, webuser=None):
+        return self.sync(wtype='put', local=local, remote=remote, write=write, webuser=webuser)
 
-    def sync(self, wtype, local=None, remote=None, write=None, ws=False, webuser=None):
+    def sync(self, wtype, local=None, remote=None, write=None, webuser=None):
         try:
             if wtype == 'put':
                 result = super(Shell, self).put(local, remote=remote)
@@ -98,7 +97,7 @@ class Shell(Connection):
                 if write:
                     with open(write, 'a') as f:
                         f.write(message)
-                elif ws and webuser:
+                elif webuser:
                     Tailf.send_message(webuser,message)
             else:
                 result = super(Shell, self).get(remote, local=local)
@@ -108,7 +107,7 @@ class Shell(Connection):
                 if write:
                     with open(write, 'a') as f:
                         f.write(message)
-                elif ws and webuser:
+                elif webuser:
                     Tailf.send_message(webuser,message)
             return result
         except Exception as e:
@@ -118,7 +117,7 @@ class Shell(Connection):
                 if write:
                     with open(write, 'a') as f:
                         f.write(message)
-                elif ws and webuser:
+                elif webuser:
                     Tailf.send_message(webuser,message)
             else:
                 message = '[%s@%s]# [下载文件]\n[ERROR] [目标目录:%s][%s]\n' % (self.user, self.host, remote, str(e))
@@ -126,5 +125,5 @@ class Shell(Connection):
                 if write:
                     with open(write, 'a') as f:
                         f.write(message)
-                elif ws and webuser:
+                elif webuser:
                     Tailf.send_message(webuser,message)

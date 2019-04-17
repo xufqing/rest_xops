@@ -330,10 +330,6 @@ class DeployExcu(Task):
             start_time, record_id, version, webuser, id, e))
         finally:
             if self.localhost:
-                # 关闭连接
-                time.sleep(10)
-                if self.localhost.file:
-                    self.localhost.file.close()
                 self.localhost.close()
             # 关闭local_tailf死循环
             redis.set('deploy_' + str(webuser) + '_' + str(id), '1')
