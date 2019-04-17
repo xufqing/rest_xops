@@ -265,12 +265,15 @@ class DeployExcu(Task):
             self.sequence = 6
             with open(log, 'a') as f:
                 f.write('[INFO]------正在执行部署后的工作[%s]------\n' % (self.sequence))
+            target_release_version = "%s/%s" % (self.target_releases, self.release_version)
+
+            # 执行自定义命令
             commands = self.post_release
             if commands:
                 for command in commands.split('\n'):
                     if command.strip().startswith('#') or not command.strip():
                         continue
-                    with connect.cd(self.target_root):
+                    with connect.cd(target_release_version):
                         if self.result.exited == 0:
                             self.result = connect.run(command, write=log)
             connect.close()
@@ -313,6 +316,7 @@ class DeployExcu(Task):
             for sid in serverid:
                 try:
                     connect = connect_init(sid)
+                    connect.init_env(env=self.custom_global_env)
                     self.do_prev_release(log, connect)
                     self.do_release(log, connect)
                     self.do_post_release(log, connect)

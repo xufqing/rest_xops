@@ -93,7 +93,7 @@ class DeployView(APIView):
             localhost = Shell('127.0.0.1')
             command = 'cd %s && git rev-parse --is-inside-work-tree' % (repo[0]['alias'])
             with localhost.cd(path):
-                result = localhost.local(command, exception=False)
+                result = localhost.local(command)
             if result.exited != 0:
                 command = 'rm -rf %s' % (path + '/' + str(repo[0]['alias']))
                 localhost.local(command)
@@ -199,6 +199,7 @@ class DeployView(APIView):
             serverid = request.data['server_ids']
             # 调用celery异步任务
             deploy.delay(id, log, version, serverid, record_id, webuser, self.start_time)
+            #deploy.run(id, log, version, serverid, record_id, webuser, self.start_time)
             return XopsResponse(record_id)
 
         elif request.data['excu'] == 'rollback':
