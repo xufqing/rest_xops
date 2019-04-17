@@ -3,7 +3,7 @@
 from fabric2 import Connection
 from invoke import Responder, Result
 from utils.websocket_tail import Tailf
-import logging
+import logging,sys
 from cmdb.models import DeviceInfo,ConnectionInfo
 
 error_logger = logging.getLogger('error')
@@ -16,7 +16,7 @@ def say_yes():
         response='yes\n',
     )
 
-def auth_init(id):
+def connect_init(id):
     device_info = DeviceInfo.objects.filter(id=int(id)).values()
     host = device_info[0]['hostname']
     auth_type = device_info[0]['auth_type']
@@ -26,19 +26,25 @@ def auth_init(id):
     port = connect_info[0]['port']
     auth_info = '{user}@{host}:{port}'.format(user=user, host=host, port=port)
     auth_key = {auth_type: passwd}
-
-    return auth_info, auth_key
+    connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+    return connect
 
 class Shell(Connection):
     run_mode_remote = 'remote'
     run_mode_local = 'local'
     custom_global_env = {}
+    file = None
 
     def init_env(self, **kwargs):
         self.custom_global_env = kwargs['env']
 
     def run(self, command, run_mode=run_mode_remote, write=None, pty=False, exception=True, ws=False, webuser=None, **kwargs):
         try:
+            if write:
+                message = '[%s@%s]# %s\n' % (self.user, self.host, command)
+                self.file = open(write, 'a')
+                self.file.write(message)
+                sys.stdout = sys.stderr = self.file
             if run_mode == self.run_mode_local:
                 result = super(Shell, self).local(command, pty=pty, echo_stdin=True, warn=True, watchers=[say_yes()],
                                                   env=self.custom_global_env, **kwargs)
@@ -47,14 +53,9 @@ class Shell(Connection):
                                                 env=self.custom_global_env, **kwargs)
             exited, stdout, stderr = result.exited, result.stdout, result.stderr
             if result.failed:
-                message = '[%s@%s]# %s\n[ERROR] %s' % (self.user, self.host, command, stdout + stderr)
+                message = '[%s@%s]# %s\n[ERROR] %s' % (self.user, self.host, command,stdout + stdout)
                 error_logger.error(message)
-            else:
-                message = '[%s@%s]# %s\n%s' % (self.user, self.host, command, stdout + stderr)
-            if write:
-                with open(write, 'a') as f:
-                    f.write(message)
-            elif ws and webuser:
+            if ws and webuser:
                 message_in = '[%s@%s]# %s' % (self.user, self.host, command)
                 websocket = Tailf()
                 websocket.send_message(webuser, message_in)
@@ -91,7 +92,7 @@ class Shell(Connection):
         try:
             if wtype == 'put':
                 result = super(Shell, self).put(local, remote=remote)
-                message = '[%s@%s]# [上传文件]\n[INFO]local:%s to [%s]:%s\n' % (
+                message = '[%s@%s]# [上传文件]\n[INFO] 本地:%s 上传到 [%s]:%s\n' % (
                             self.user, self.host, local, result.connection.host, remote)
                 info_logger.info(message)
                 if write:
@@ -101,7 +102,7 @@ class Shell(Connection):
                     Tailf.send_message(webuser,message)
             else:
                 result = super(Shell, self).get(remote, local=local)
-                message = '[%s@%s]# [下载文件]\n[INFO] [%s]:%s  to local:%s\n' % (
+                message = '[%s@%s]# [下载文件]\n[INFO] [%s]:%s 下载到 本地:%s\n' % (
                             self.user, self.host, result.connection.host, remote, local)
                 info_logger.info(message)
                 if write:
@@ -112,7 +113,7 @@ class Shell(Connection):
             return result
         except Exception as e:
             if wtype == 'put':
-                message = '[%s@%s]# [上传文件]\n[ERROR][目标目录:%s][%s]\n' % (self.user, self.host, remote, str(e))
+                message = '[%s@%s]# [上传文件]\n[ERROR] [目标目录:%s][%s]\n' % (self.user, self.host, remote, str(e))
                 error_logger.info(message)
                 if write:
                     with open(write, 'a') as f:
@@ -120,7 +121,7 @@ class Shell(Connection):
                 elif ws and webuser:
                     Tailf.send_message(webuser,message)
             else:
-                message = '[%s@%s]# [下载文件]\n[ERROR][目标目录:%s][%s]\n' % (self.user, self.host, remote, str(e))
+                message = '[%s@%s]# [下载文件]\n[ERROR] [目标目录:%s][%s]\n' % (self.user, self.host, remote, str(e))
                 error_logger.info(message)
                 if write:
                     with open(write, 'a') as f:

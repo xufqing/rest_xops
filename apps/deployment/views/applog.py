@@ -5,7 +5,7 @@ from rest_xops.basic import XopsResponse
 from rest_xops.code import *
 from common.custom import RbacPermission
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from utils.shell_excu import Shell,auth_init
+from utils.shell_excu import Shell, connect_init
 from django.http import FileResponse
 from rest_framework.renderers import BaseRenderer
 import os
@@ -32,8 +32,7 @@ class AppLogView(APIView):
             try:
                 app_log_path = request.data['app_log_path']
                 host = request.data['host']
-                auth_info, auth_key = auth_init(host)
-                connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+                connect = connect_init(host)
                 commands = "find %s -name '*.log'" % (app_log_path)
                 result = connect.run(commands).stdout
                 res = []
@@ -55,8 +54,7 @@ class AppLogView(APIView):
             old_file_name = os.path.splitext(file_name)
             if old_file_name[1] == '.log':
                 new_file_name = old_file_name[0] + '.tar.gz'
-                auth_info, auth_key = auth_init(host)
-                connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+                connect = connect_init(host)
                 commands = 'mkdir -p /tmp/remote/ && tar czf /tmp/remote/%s -C %s %s' % (new_file_name, dir_name, file_name)
                 connect.run(commands)
                 connect.get('/tmp/remote/' + new_file_name ,'/tmp/' + new_file_name)

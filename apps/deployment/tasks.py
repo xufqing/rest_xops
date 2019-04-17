@@ -4,7 +4,7 @@
 # @Author  : xufqing
 
 from deployment.models import Project, DeployRecord
-from utils.shell_excu import Shell, auth_init
+from utils.shell_excu import Shell, connect_init
 from utils.common import includes_format, excludes_format
 from utils.websocket_tail import Tailf
 from django.conf import settings
@@ -102,7 +102,6 @@ class DeployExcu(Task):
                     continue
                 with self.localhost.cd(self.local_code_path):
                     self.result = self.localhost.local(command, write=log)
-
     def do_checkout(self, version, log):
         '''
         检出代码
@@ -313,8 +312,7 @@ class DeployExcu(Task):
             self.do_post_deploy(log)
             for sid in serverid:
                 try:
-                    auth_info, auth_key = auth_init(sid)
-                    connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+                    connect = connect_init(sid)
                     self.do_prev_release(log, connect)
                     self.do_release(log, connect)
                     self.do_post_release(log, connect)
@@ -327,12 +325,15 @@ class DeployExcu(Task):
             self.end(serverid, record_id)
             info_logger.info('[部署任务已结束] 记录ID：%s 部署版本：%s 用户：%s 项目ID：%s' % (record_id, version, webuser, id))
         except Exception as e:
-            Tailf.send_message(webuser, '[ERROR] 错误信息:' % e)
+            Tailf.send_message(webuser, '[ERROR] 错误信息: %s' % e)
             error_logger.error('[部署任务错误] 开始时间：%s 记录ID：%s 部署版本：%s 用户：%s 项目ID：%s 信息：%s' % (
             start_time, record_id, version, webuser, id, e))
         finally:
             if self.localhost:
                 # 关闭连接
+                time.sleep(10)
+                if self.localhost.file:
+                    self.localhost.file.close()
                 self.localhost.close()
             # 关闭local_tailf死循环
             redis.set('deploy_' + str(webuser) + '_' + str(id), '1')

@@ -6,7 +6,7 @@ from rest_xops.code import *
 from rest_xops.basic import XopsResponse
 from ..models import Project, DeployRecord
 from cmdb.models import DeviceInfo, ConnectionInfo
-from utils.shell_excu import Shell, auth_init
+from utils.shell_excu import Shell, connect_init
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 import os, logging, time
 from common.custom import CommonPagination, RbacPermission
@@ -118,8 +118,7 @@ class DeployView(APIView):
         name = '回滚_' + str(id) + '_' + record_id
         for sid in server_ids:
             try:
-                auth_info, auth_key = auth_init(sid)
-                connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+                connect = connect_init(sid)
                 version_file = '%s/%s' % (record[0]['target_root'], record[0]['alias'] + '_version.txt')
                 # 判断回滚版本是否存在
                 command = '[ -d %s/%s ] || echo "false"' % (record[0]['target_releases'], record[0]['prev_record'])
@@ -199,6 +198,7 @@ class DeployView(APIView):
             serverid = request.data['server_ids']
             # 调用celery异步任务
             deploy.delay(id,log,version,serverid,record_id,webuser,self.start_time)
+            #deploy.run(id, log, version, serverid, record_id, webuser, self.start_time)
             return XopsResponse(record_id)
 
         elif request.data['excu'] == 'rollback':
@@ -251,8 +251,7 @@ class DeployView(APIView):
                 app_start = request.data['app_start']
                 host = request.data['host']
                 webuser = request.user.username
-                auth_info, auth_key = auth_init(host)
-                connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+                connect = connect_init(host)
                 app_start = app_start.strip().replace('&&', '').replace('||', '')
                 connect.run(app_start, ws=True, webuser=webuser)
                 connect.close()
@@ -269,8 +268,7 @@ class DeployView(APIView):
                 app_stop = request.data['app_stop']
                 host = request.data['host']
                 webuser = request.user.username
-                auth_info, auth_key = auth_init(host)
-                connect = Shell(auth_info, connect_timeout=5, connect_kwargs=auth_key)
+                connect = connect_init(host)
                 app_stop = app_stop.strip().replace('&&', '').replace('||', '')
                 connect.run(app_stop, ws=True, webuser=webuser)
                 connect.close()
