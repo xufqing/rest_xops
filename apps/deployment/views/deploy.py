@@ -198,8 +198,8 @@ class DeployView(APIView):
             version = request.data['version'].strip()
             serverid = request.data['server_ids']
             # 调用celery异步任务
-            deploy.delay(id, log, version, serverid, record_id, webuser, self.start_time)
-            #deploy.run(id, log, version, serverid, record_id, webuser, self.start_time)
+            #deploy.delay(id, log, version, serverid, record_id, webuser, self.start_time)
+            deploy.run(id, log, version, serverid, record_id, webuser, self.start_time)
             return XopsResponse(record_id)
 
         elif request.data['excu'] == 'rollback':

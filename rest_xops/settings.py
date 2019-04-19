@@ -185,7 +185,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'standard': {
-            'format': '[%(asctime)s][%(levelname)s]%(message)s'
+            'format': '[%(asctime)s][%(levelname)s]''[%(filename)s:%(lineno)d][%(message)s]'
         },
         'simple': {
             'format': '[%(levelname)s][%(asctime)s]%(message)s'

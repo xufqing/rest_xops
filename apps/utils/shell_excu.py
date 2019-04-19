@@ -39,23 +39,24 @@ class Shell(Connection):
 
     def run(self, command, run_mode=run_mode_remote, write=None, pty=False, webuser=None, **kwargs):
         try:
-            stream = None
+            stream_out = None
+            stream_err = None
             if write:
                 io_dict = {}
                 file_name = os.path.basename(write)
                 io = os.path.splitext(file_name)[0]
-                io_dict[io] = StringIO()
-                stream = io_dict[io]
+                stream_out = io_dict[io + '_out'] = StringIO()
+                stream_err = io_dict[io + '_err'] = StringIO()
                 message = '[%s@%s]# %s\n' % (self.user, self.host, command)
                 file = open(write, 'a')
                 file.write(message)
-                io_dict[io] = file
+                stream_out = stream_err = file
             if run_mode == self.run_mode_local:
-                result = super(Shell, self).local(command, pty=pty, warn=True, out_stream=stream, err_stream=stream,
+                result = super(Shell, self).local(command, pty=pty, warn=True, out_stream=stream_out, err_stream=stream_err,
                                                   watchers=[say_yes()],
                                                   env=self.custom_global_env, **kwargs)
             else:
-                result = super(Shell, self).run(command, pty=pty, warn=True, out_stream=stream, err_stream=stream,
+                result = super(Shell, self).run(command, pty=pty, warn=True, out_stream=stream_out, err_stream=stream_err,
                                                 watchers=[say_yes()],
                                                 env=self.custom_global_env, **kwargs)
             exited, stdout, stderr = result.exited, result.stdout, result.stderr

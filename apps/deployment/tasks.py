@@ -162,9 +162,6 @@ class DeployExcu(Task):
                         command = 'tar cf ../%s %s' % (self.release_version + '.tar', files)
                         if self.result.exited == 0:
                             self.result = self.localhost.local(command, write=log)
-            else:
-                with open(log, 'a') as f:
-                    f.write('[ERROR]------检出代码错误!------\n')
 
     def do_prev_release(self, log, connect):
         '''
