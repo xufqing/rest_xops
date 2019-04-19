@@ -106,25 +106,21 @@ class DeployExcu(Task):
         '''
         检出代码
         '''
-        if self.result.exited == 0:
-            self.sequence = 2
-            with open(log, 'a') as f:
-                f.write('[INFO]------正在执行代码检出[%s]------\n' % (self.sequence))
+        self.sequence = 2
+        with open(log, 'a') as f:
+            f.write('[INFO]------正在执行代码检出[%s]------\n' % (self.sequence))
 
-            # 更新到指定 commit
-            with self.localhost.cd(self.local_code_path):
-                self.result = self.localhost.local('git fetch --all', write=log)
-                if self.environment == 'tag':
-                    command = 'git rev-parse %s' % (version)
-                else:
-                    command = 'git rev-parse refs/remotes/origin/%s' % (version)
-                commit_id = self.localhost.local(command, write=log).stdout.strip()
-                command = 'git checkout -f %s' % (commit_id)
-                if self.result.exited == 0:
-                    self.result = self.localhost.local(command, write=log)
-                command = 'git show --stat'
-                if self.result.exited == 0:
-                    self.result = self.localhost.local(command, write=log)
+        # 更新到指定 commit
+        with self.localhost.cd(self.local_code_path):
+            self.result = self.localhost.local('git fetch --all', write=log)
+            command = 'git rev-parse %s' % (version)
+            commit_id = self.localhost.local(command, write=log).stdout.strip()
+            command = 'git checkout -f %s' % (commit_id)
+            if self.result.exited == 0:
+                self.result = self.localhost.local(command, write=log)
+            command = 'git show --stat'
+            if self.result.exited == 0:
+                self.result = self.localhost.local(command, write=log)
 
     def do_post_deploy(self, log):
         '''
@@ -143,28 +139,32 @@ class DeployExcu(Task):
                         if self.result.exited == 0:
                             self.result = self.localhost.local(command, write=log)
             # 打包编译后的文件：包含或排除
-            self.release_version = self.record_id
-            with self.localhost.cd(self.local_code_path):
-                if self.is_include:
-                    files = includes_format(self.local_code_path, self.excludes)
-                    for file in files:
-                        dirname = file[0]
-                        filename = '.' if file[1] == '*' else file[1]
-                        tar_name = self.local_project_path.rstrip('/') + '/' + self.release_version + '.tar'
-                        tar_params = 'tar rf' if os.path.exists(tar_name) else 'tar cf'
-                        if dirname:
-                            command = '%s %s -C %s %s' % (tar_params, tar_name, dirname, filename)
-                            if self.result.exited == 0:
-                                self.result = self.localhost.local(command, write=log)
-                        else:
-                            command = '%s %s %s' % (tar_params, tar_name, filename)
-                            if self.result.exited == 0:
-                                self.result = self.localhost.local(command, write=log)
-                else:
-                    files = excludes_format(self.local_code_path, self.excludes)
-                    command = 'tar cf ../%s %s' % (self.release_version + '.tar', files)
-                    if self.result.exited == 0:
-                        self.result = self.localhost.local(command, write=log)
+            if self.result.exited == 0:
+                self.release_version = self.record_id
+                with self.localhost.cd(self.local_code_path):
+                    if self.is_include:
+                        files = includes_format(self.local_code_path, self.excludes)
+                        for file in files:
+                            dirname = file[0]
+                            filename = '.' if file[1] == '*' else file[1]
+                            tar_name = self.local_project_path.rstrip('/') + '/' + self.release_version + '.tar'
+                            tar_params = 'tar rf' if os.path.exists(tar_name) else 'tar cf'
+                            if dirname:
+                                command = '%s %s -C %s %s' % (tar_params, tar_name, dirname, filename)
+                                if self.result.exited == 0:
+                                    self.result = self.localhost.local(command, write=log)
+                            else:
+                                command = '%s %s %s' % (tar_params, tar_name, filename)
+                                if self.result.exited == 0:
+                                    self.result = self.localhost.local(command, write=log)
+                    else:
+                        files = excludes_format(self.local_code_path, self.excludes)
+                        command = 'tar cf ../%s %s' % (self.release_version + '.tar', files)
+                        if self.result.exited == 0:
+                            self.result = self.localhost.local(command, write=log)
+            else:
+                with open(log, 'a') as f:
+                    f.write('[ERROR]------检出代码错误!------\n')
 
     def do_prev_release(self, log, connect):
         '''
