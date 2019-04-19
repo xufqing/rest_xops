@@ -3,12 +3,12 @@
 from fabric2 import Connection
 from invoke import Responder, Result
 from utils.websocket_tail import Tailf
-import logging,sys
+from io import StringIO
+import logging, os
 from cmdb.models import DeviceInfo,ConnectionInfo
 
 error_logger = logging.getLogger('error')
 info_logger = logging.getLogger('info')
-
 
 def say_yes():
     return Responder(
@@ -39,20 +39,28 @@ class Shell(Connection):
 
     def run(self, command, run_mode=run_mode_remote, write=None, pty=False, webuser=None, **kwargs):
         try:
+            stream = None
             if write:
+                io_dict = {}
+                file_name = os.path.basename(write)
+                io = os.path.splitext(file_name)[0]
+                io_dict[io] = StringIO()
+                stream = io_dict[io]
                 message = '[%s@%s]# %s\n' % (self.user, self.host, command)
                 file = open(write, 'a')
                 file.write(message)
-                sys.stdout = sys.stderr = file
+                io_dict[io] = file
             if run_mode == self.run_mode_local:
-                result = super(Shell, self).local(command, pty=pty, warn=True, watchers=[say_yes()],
+                result = super(Shell, self).local(command, pty=pty, warn=True, out_stream=stream, err_stream=stream,
+                                                  watchers=[say_yes()],
                                                   env=self.custom_global_env, **kwargs)
             else:
-                result = super(Shell, self).run(command, pty=pty,warn=True, watchers=[say_yes()],
+                result = super(Shell, self).run(command, pty=pty, warn=True, out_stream=stream, err_stream=stream,
+                                                watchers=[say_yes()],
                                                 env=self.custom_global_env, **kwargs)
             exited, stdout, stderr = result.exited, result.stdout, result.stderr
             if result.failed:
-                message = '[%s@%s]# %s\n[ERROR] %s' % (self.user, self.host, command,stdout + stdout)
+                message = '[%s@%s]# %s\n[ERROR] %s' % (self.user, self.host, command, stdout + stdout)
                 error_logger.error(message)
             if webuser:
                 message_in = '[%s@%s]# %s' % (self.user, self.host, command)
