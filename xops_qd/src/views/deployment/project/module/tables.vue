@@ -14,13 +14,16 @@
           <span v-else style="color:red">失败</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="350px" align="center">
+      <el-table-column label="操作" width="400px" align="center">
         <template slot-scope="scope">
           <div style="display: inline-block;margin: 0px 1px;">
-            <el-button v-if="checkPermission(['admin','project_all','project_edit'])" :loading="initLoading" size="mini" type="success" @click="toInit(scope.row.id)">检查</el-button>
+            <el-button v-if="checkPermission(['admin','project_all','project_edit'])" :loading="initLoading" size="mini" type="primary" @click="toInit(scope.row.id)">检查</el-button>
           </div>
           <member v-if="checkPermission(['admin','project_all','project_edit'])" :data="scope.row" :sup_this="sup_this"/>
           <el-button v-if="checkPermission(['admin','project_all','project_list'])" size="mini" type="primary" @click="toDetail(scope.row.id)">详情</el-button>
+          <div style="display: inline-block;margin: 0px 1px;">
+            <el-button v-if="checkPermission(['admin','project_all'])" size="mini" type="primary" @click="toCopy(scope.row.id)">复制</el-button>
+          </div>
           <el-popover
             v-if="checkPermission(['admin','project_all','project_delete'])"
             :ref="scope.row.id"
@@ -48,7 +51,7 @@
 <script>
 import checkPermission from '@/utils/permission' // 权限判断函数
 import member from './member'
-import { del } from '@/api/project'
+import { del, copy } from '@/api/project'
 import { DeployExcu } from '@/api/deploy'
 import { parseTime } from '@/utils/index'
 export default {
@@ -100,7 +103,7 @@ export default {
       del(id).then(res => {
         this.delLoading = false
         this.$refs[id].doClose()
-        this.init()
+        this.sup_this.init()
         this.$message({
           showClose: true,
           type: 'success',
@@ -111,6 +114,34 @@ export default {
         this.delLoading = false
         this.$refs[id].doClose()
         console.log(err)
+      })
+    },
+    toCopy(id) {
+      this.$confirm('是否复制本项目?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const form = { id: id }
+        copy(form).then(res => {
+          this.delLoading = false
+          console.log(this)
+          this.sup_this.init()
+          this.$message({
+            showClose: true,
+            type: 'success',
+            message: '复制成功!',
+            duration: 2500
+          })
+        }).catch(err => {
+          this.delLoading = false
+          console.log(err)
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消操作'
+        })
       })
     }
   }

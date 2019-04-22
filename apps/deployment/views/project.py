@@ -1,6 +1,7 @@
 # @Time    : 2019/2/27 14:39
 # @Author  : xufqing
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from ..models import Project
 from ..serializers.project_serializer import ProjectSerializer, ProjectListSerializer
 from common.custom import CommonPagination, RbacPermission
@@ -8,6 +9,9 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
+from rest_xops.code import *
+from rest_xops.basic import XopsResponse
+import copy
 
 
 class ProjectViewSet(ModelViewSet):
@@ -46,3 +50,25 @@ class ProjectViewSet(ModelViewSet):
             result = self.queryset.filter(
                 Q(user_id__icontains=uid + ',') | Q(user_id__in=uid) | Q(user_id__endswith=',' + uid))
         return result
+
+class ProjectCopy(APIView):
+    perms_map = ({'*': 'admin'}, {'*': 'project_all'})
+    permission_classes = (RbacPermission,)
+    authentication_classes = (JSONWebTokenAuthentication,)
+
+    def post(self, request, format=None):
+        if request.data['id']:
+            old_project = Project.objects.get(id=request.data['id'])
+            new_project = copy.deepcopy(old_project)
+            new_project.pk = None
+            new_project.name = '复制___' + new_project.name
+            new_project.status = 'Failed'
+            new_project.save()
+            http_status = OK
+            msg = '复制成功!'
+        else:
+            http_status = BAD
+            msg = '复制失败!项目ID为空!'
+        return XopsResponse(msg, status=http_status)
+
+

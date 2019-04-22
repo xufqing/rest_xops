@@ -1,6 +1,6 @@
 <template>
   <div style="display: inline-block;margin: 0px 1px;">
-    <el-button size="mini" type="warning" @click="to">成员管理</el-button>
+    <el-button size="mini" type="primary" @click="to">成员管理</el-button>
     <el-dialog :append-to-body="true" :visible.sync="dialog" title="项目成员管理" width="540px">
       <el-form ref="form" :model="form" label-position="top" size="small">
         <el-form-item>

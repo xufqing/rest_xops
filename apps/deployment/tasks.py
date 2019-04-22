@@ -62,6 +62,7 @@ class DeployExcu(Task):
             self.local_log_path = self._path + str(id) + '_' + str(project[0]['alias']) + '/logs'
             self.is_include = project[0]['is_include']
             self.excludes = project[0]['excludes']
+            self.is_link = project[0]['is_link']
             self.task_envs = project[0]['task_envs']
             self.prev_deploy = project[0]['prev_deploy']
             self.post_deploy = project[0]['post_deploy']
@@ -242,17 +243,29 @@ class DeployExcu(Task):
                     self.result = connect.run(command, write=log)
                     self.prev_release_version = self.result.stdout
 
-            # 如果存在旧版本，则删除软链
+            # 如果存在旧版本，则删除软链或删除文件
             if self.prev_release_version:
-                command = 'find %s -type l -delete' % (self.target_root)
-                if self.result.exited == 0:
-                    self.result = connect.run(command, write=log)
-            # 创建当前版本软链到webroot
-            command = 'ln -sfn %s/%s/* %s && echo %s > %s' % (self.target_releases,
-                                                              self.release_version, self.target_root,
-                                                              self.release_version, version_file)
-            if self.result.exited == 0:
-                self.result = connect.run(command, write=log)
+                if self.is_link:
+                    command = 'find %s -type l -delete' % (self.target_root)
+                    if self.result.exited == 0:
+                        self.result = connect.run(command, write=log)
+                    # 创建当前版本软链到webroot
+                    command = 'ln -sfn %s/%s/* %s && echo %s > %s' % (self.target_releases,
+                                                                      self.release_version, self.target_root,
+                                                                      self.release_version, version_file)
+                    if self.result.exited == 0:
+                        self.result = connect.run(command, write=log)
+                else:
+                    command = 'rm -rf %s/*' % (self.target_root)
+                    if self.result.exited == 0:
+                        self.result = connect.run(command, write=log)
+                    # 复制文件到webroot
+                    command = 'cp -r %s/%s/* %s && echo %s > %s' % (self.target_releases,
+                                                                      self.release_version, self.target_root,
+                                                                      self.release_version, version_file)
+                    if self.result.exited == 0:
+                        self.result = connect.run(command, write=log)
+
 
     def do_post_release(self, log, connect):
         '''
@@ -318,7 +331,7 @@ class DeployExcu(Task):
                     self.do_release(log, connect)
                     self.do_post_release(log, connect)
                 except Exception as e:
-                    time.sleep(20)
+                    time.sleep(5)
                     Tailf.send_message(webuser, '[ERROR] 服务器为空或ID %s 可能已被删除!' % sid)
                     Tailf.send_message(webuser, '[ERROR] 错误信息:' % e)
                     error_logger.error('[部署任务错误] 开始时间：%s 记录ID：%s 部署版本：%s 用户：%s 项目ID：%s 信息：%s' % (

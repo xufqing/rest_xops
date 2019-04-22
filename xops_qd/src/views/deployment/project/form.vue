@@ -53,31 +53,43 @@
             filter-placeholder="请输入IP地址"></el-transfer>
         </el-form-item>
         <el-row>
-          <el-col :span="9">
+          <el-col :span="12">
             <el-form-item>
               <el-tooltip class="item" effect="dark" placement="top">
                 <div slot="content"><span>目标服务器的webroot路径<br/>例：tomcat webapps</span></div>
-                <span class="x-info">目标服务器部署（WEB）路径<i class="el-icon-info"></i></span>
+                <span class="x-info">WEBROOT路径<i class="el-icon-info"></i></span>
               </el-tooltip>
               <el-input v-model="form.target_root" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
-          <el-col :span="9">
+          <el-col :span="12">
             <el-form-item>
               <el-tooltip class="item" effect="dark" placement="top">
-                <div slot="content"><span>存放应用版本的路径</span></div>
-                <span class="x-info">目标服务器RELEASE路径（版本仓库）<i class="el-icon-info"></i></span>
+                <div slot="content"><span>目标服务器存放应用版本的路径（版本仓库）</span></div>
+                <span class="x-info">RELEASE路径<i class="el-icon-info"></i></span>
               </el-tooltip>
               <el-input v-model="form.target_releases" :readonly="is_Readonly" style="width: 300px;"/>
             </el-form-item>
           </el-col>
-          <el-col :span="6">
+        </el-row>
+        <el-row>
+          <el-col :span="12">
             <el-form-item>
               <el-tooltip class="item" effect="dark" placement="top">
                 <div slot="content"><span>需要保存的版本数量</span></div>
                 <span class="x-info">仓库版本保留数<i class="el-icon-info"></i></span>
               </el-tooltip>
               <el-input v-model="form.version_num" :readonly="is_Readonly" style="width: 200px;"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item>
+              <el-tooltip class="item" effect="dark" placement="top">
+                <div slot="content"><span>是否采用软连接方式发布<br/>注:软链接方式发布更快,但不支持某些场景的中间件</span></div>
+                <span class="x-info">是否软链接<i class="el-icon-info"></i></span>
+              </el-tooltip>
+              <el-radio v-model="form.is_link" label="false">否</el-radio>
+              <el-radio v-model="form.is_link" label="true">是</el-radio>
             </el-form-item>
           </el-col>
         </el-row>
@@ -241,6 +253,7 @@ export default {
         environment: '',
         excludes: '',
         is_include: 'false',
+        is_link: 'true',
         target_root: '',
         target_releases: '',
         task_envs: '',
@@ -298,6 +311,7 @@ export default {
     init() {
       retrieve(this.$route.query.id).then(res => {
         res.is_include = res.is_include.toString()
+        res.is_link = res.is_link.toString()
         this.form = res
         this.serverIds = this.form.server_ids.split(',')
       })
@@ -367,6 +381,7 @@ export default {
         environment: '',
         excludes: '',
         is_include: 'false',
+        is_link: 'true',
         target_root: '',
         target_releases: '',
         task_envs: '',

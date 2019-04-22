@@ -8,11 +8,11 @@
           <img :src="scope.row.image" class="el-avatar">
         </template>
       </el-table-column>
-      <el-table-column prop="username" label="用户名" width="100px"/>
+      <el-table-column prop="username" label="用户名" width="150px"/>
       <el-table-column prop="name" label="姓名" width="100px"/>
       <el-table-column prop="email" label="邮箱"/>
-      <el-table-column prop="mobile" label="手机号码"/>
-      <el-table-column prop="department.name" label="部门"/>
+      <el-table-column prop="mobile" label="手机号码" width="100px"/>
+      <el-table-column prop="department.name" label="部门" width="100px"/>
       <el-table-column prop="position" label="职位" width="100px"/>
       <el-table-column label="状态" width="50px">
         <template slot-scope="scope">

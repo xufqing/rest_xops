@@ -14,6 +14,7 @@ class Project(TimeAbstract):
     status = models.CharField(max_length=20,blank=True, null=True, verbose_name="状态")
     excludes = models.TextField(blank=True, null=True, verbose_name='排除')
     is_include = models.BooleanField(default=False, verbose_name="包含")
+    is_link = models.BooleanField(default=True, verbose_name="是否link")
     target_root = models.CharField(default='',max_length=200, verbose_name='部署路径')
     target_releases = models.CharField(default='',max_length=200, verbose_name='目标仓库')
     task_envs = models.TextField(blank=True, null=True, verbose_name='全局变量')

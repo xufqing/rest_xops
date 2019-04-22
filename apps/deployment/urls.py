@@ -11,5 +11,6 @@ urlpatterns = [
     path(r'api/', include(router.urls)),
     path(r'api/deploy/excu/', deploy.DeployView.as_view(), name='deploy'),
     path(r'api/deploy/ver/', deploy.VersionView.as_view(), name='version'),
-    path(r'api/deploy/applog/', applog.AppLogView.as_view(), name='applog')
+    path(r'api/deploy/applog/', applog.AppLogView.as_view(), name='applog'),
+    path(r'api/project/copy/', project.ProjectCopy.as_view(), name='project_copy')
 ]

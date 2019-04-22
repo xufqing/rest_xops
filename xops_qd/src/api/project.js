@@ -29,3 +29,11 @@ export function edit(id, data) {
     data
   })
 }
+
+export function copy(data) {
+  return request({
+    url: 'api/project/copy/',
+    method: 'post',
+    data
+  })
+}

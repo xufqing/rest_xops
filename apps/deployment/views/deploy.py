@@ -113,6 +113,7 @@ class DeployView(APIView):
         with open(log, 'a') as f:
             f.write('[INFO]------正在执行回滚 [%s]------\n' % (sequence))
         record = DeployRecord.objects.filter(id=int(id)).values()
+        is_link = Project.objects.get(id=record[0]['project_id']).is_link
         server_ids = record[0]['server_ids'].split(',')
         name = '回滚_' + str(id) + '_' + record_id
         for sid in server_ids:
@@ -123,13 +124,20 @@ class DeployView(APIView):
                 command = '[ -d %s/%s ] || echo "false"' % (record[0]['target_releases'], record[0]['prev_record'])
                 self.result = connect.run(command, write=log)
                 if not self.result.stdout.strip() == 'false':
-                    # 删除目标软链
-                    command = 'find %s -type l -delete' % (record[0]['target_root'])
-                    self.result = connect.run(command, write=log)
-                    # 创建需回滚版本软链到webroot
-                    command = 'ln -sfn %s/%s/* %s' % (
-                        record[0]['target_releases'], record[0]['prev_record'], record[0]['target_root'])
-                    if self.result.exited == 0: self.result = connect.run(command, write=log)
+                    if is_link:
+                        # 删除目标软链
+                        command = 'find %s -type l -delete' % (record[0]['target_root'])
+                        self.result = connect.run(command, write=log)
+                        # 创建需回滚版本软链到webroot
+                        command = 'ln -sfn %s/%s/* %s' % (
+                            record[0]['target_releases'], record[0]['prev_record'], record[0]['target_root'])
+                        if self.result.exited == 0: self.result = connect.run(command, write=log)
+                    else:
+                        command = 'rm -rf %s/*' % (record[0]['target_root'])
+                        self.result = connect.run(command, write=log)
+                        command = 'cp -r %s/%s/* %s' % (
+                            record[0]['target_releases'], record[0]['prev_record'], record[0]['target_root'])
+                        if self.result.exited == 0: self.result = connect.run(command, write=log)
                     command = 'echo %s > %s' % (record[0]['prev_record'], version_file)
                     if self.result.exited == 0: self.result = connect.run(command, write=log)
                     with open(log, 'a') as f:
@@ -198,8 +206,8 @@ class DeployView(APIView):
             version = request.data['version'].strip()
             serverid = request.data['server_ids']
             # 调用celery异步任务
-            #deploy.delay(id, log, version, serverid, record_id, webuser, self.start_time)
-            deploy.run(id, log, version, serverid, record_id, webuser, self.start_time)
+            deploy.delay(id, log, version, serverid, record_id, webuser, self.start_time)
+            #deploy.run(id, log, version, serverid, record_id, webuser, self.start_time)
             return XopsResponse(record_id)
 
         elif request.data['excu'] == 'rollback':
@@ -253,7 +261,7 @@ class DeployView(APIView):
                 host = request.data['host']
                 webuser = request.user.username
                 connect = connect_init(host)
-                app_start = app_start.strip().replace('&&', '').replace('||', '')
+                app_start = app_start.strip()
                 connect.run(app_start, webuser=webuser)
                 connect.close()
                 http_status = OK
@@ -270,7 +278,7 @@ class DeployView(APIView):
                 host = request.data['host']
                 webuser = request.user.username
                 connect = connect_init(host)
-                app_stop = app_stop.strip().replace('&&', '').replace('||', '')
+                app_stop = app_stop.strip()
                 connect.run(app_stop, webuser=webuser)
                 connect.close()
                 http_status = OK

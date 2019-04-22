@@ -49,8 +49,9 @@ class Shell(Connection):
                 stream_err = io_dict[io + '_err'] = StringIO()
                 message = '[%s@%s]# %s\n' % (self.user, self.host, command)
                 file = open(write, 'a')
-                file.write(message)
+                #file.write(message)
                 stream_out = stream_err = file
+                stream_out.write(message)
             if run_mode == self.run_mode_local:
                 result = super(Shell, self).local(command, pty=pty, warn=True, out_stream=stream_out, err_stream=stream_err,
                                                   watchers=[say_yes()],
