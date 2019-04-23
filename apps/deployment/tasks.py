@@ -113,7 +113,7 @@ class DeployExcu(Task):
 
         # 更新到指定 commit
         with self.localhost.cd(self.local_code_path):
-            self.result = self.localhost.local('git fetch --all', write=log)
+            self.result = self.localhost.local('git checkout master && git pull', write=log)
             command = 'git rev-parse %s' % (version)
             commit_id = self.localhost.local(command, write=log).stdout.strip()
             command = 'git checkout -f %s' % (commit_id)
