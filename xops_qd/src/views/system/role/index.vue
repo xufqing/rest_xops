@@ -3,9 +3,14 @@
     <eHeader :query="query"/>
     <!--表格渲染-->
     <el-table v-loading="loading" :data="data" size="small" border style="width: 100%;">
+      <el-table-column label="序号" width="60" align="center">
+        <template slot-scope="scope">
+          <div>{{ scope.$index + 1 }}</div>
+        </template>
+      </el-table-column>
       <el-table-column prop="name" label="名称"/>
       <el-table-column prop="desc" label="描述"/>
-      <el-table-column label="操作" width="150px" align="center">
+      <el-table-column label="操作" width="250px" align="center">
         <template slot-scope="scope">
           <edit v-if="checkPermission(['admin','role_all','role_edit'])" :data="scope.row" :sup_this="sup_this"/>
           <el-popover

@@ -9,7 +9,7 @@
       </el-tab-pane>
       <el-tab-pane label="附加信息" name="third">
       </el-tab-pane>
-      <el-tab-pane v-if="checkPermission(['admin','connection_all','connection_list'])" label="密码信息" name="fourth">
+      <el-tab-pane v-if="checkPermission(['admin'])" label="密码信息" name="fourth">
         <Passwd ref="form_passwd"/>
       </el-tab-pane>
     </el-tabs>

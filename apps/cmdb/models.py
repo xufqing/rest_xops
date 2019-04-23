@@ -85,7 +85,9 @@ class DeviceInfo(AbstractMode, DeviceAbstract, TimeAbstract):
     warranty_date = models.DateField(default=datetime.now, verbose_name="到保日期")
     desc = models.TextField(blank=True, default='', verbose_name='备注信息')
     changed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
-    businesses = models.ManyToManyField("Business", blank=True, verbose_name="权限")
+    businesses = models.ManyToManyField("Business", blank=True, verbose_name="业务")
+    groups = models.ManyToManyField("DeviceGroup", blank=True, verbose_name="设备组")
+    labels = models.ManyToManyField("Label", blank=True, verbose_name="标签")
     history = HistoricalRecords(excluded_fields=['add_time', 'modify_time', 'pid'])
 
     class Meta:
@@ -107,6 +109,23 @@ class Business(AbstractMode, TimeAbstract):
     class Meta:
         verbose_name = '业务'
         verbose_name_plural = verbose_name
+
+class DeviceGroup(AbstractMode, TimeAbstract):
+    name = models.CharField(max_length=50, verbose_name='组名')
+    desc = models.CharField(max_length=255, blank=True, null=True, verbose_name='备注')
+
+    class Meta:
+        verbose_name = '设备组'
+        verbose_name_plural = verbose_name
+
+class Label(TimeAbstract):
+    name = models.CharField(max_length=50, verbose_name='标签名')
+    desc = models.CharField(max_length=255, blank=True, null=True, verbose_name='备注')
+
+    class Meta:
+        verbose_name = '标签'
+        verbose_name_plural = verbose_name
+
 
 class DeviceFile(TimeAbstract):
     device = models.ForeignKey('DeviceInfo', blank=True, null=True, on_delete=models.SET_NULL, verbose_name='设备')

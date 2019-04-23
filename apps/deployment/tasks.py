@@ -265,6 +265,19 @@ class DeployExcu(Task):
                                                                       self.release_version, version_file)
                     if self.result.exited == 0:
                         self.result = connect.run(command, write=log)
+            else:
+                if self.is_link:
+                    command = 'ln -sfn %s/%s/* %s && echo %s > %s' % (self.target_releases,
+                                                                      self.release_version, self.target_root,
+                                                                      self.release_version, version_file)
+                    if self.result.exited == 0:
+                        self.result = connect.run(command, write=log)
+                else:
+                    command = 'cp -r %s/%s/* %s && echo %s > %s' % (self.target_releases,
+                                                                      self.release_version, self.target_root,
+                                                                      self.release_version, version_file)
+                    if self.result.exited == 0:
+                        self.result = connect.run(command, write=log)
 
 
     def do_post_release(self, log, connect):

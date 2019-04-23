@@ -1,50 +1,60 @@
 <template>
   <div class="app-container">
     <eHeader :query="query"/>
-    <!--表格渲染-->
-    <el-table v-loading="loading" ref="table" :data="data" size="small" border style="width: 100%;" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center">
-      </el-table-column>
-      <el-table-column label="序号" width="60" align="center">
-        <template slot-scope="scope">
-          <div>{{ scope.$index + 1 }}</div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="sys_hostname" label="主机名" width="150"/>
-      <el-table-column prop="hostname" label="IP/域名" width="120"/>
-      <el-table-column prop="auth_type" label="认证类型" width="100"/>
-      <el-table-column prop="os_version" label="系统版本"/>
-      <el-table-column label="状态" width="100">
-        <template slot-scope="scope">
-          <span v-if="scope.row.status == 'online'" style="color:#00CC00">在线</span>
-          <span v-else style="color:red">下线</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="150px" align="center">
-        <template slot-scope="scope">
-          <el-button v-if="checkPermission(['admin','device_all','device_list'])" size="mini" type="primary" @click="toDetail(scope.row.id)">详情</el-button>
-          <el-popover
-            v-if="checkPermission(['admin','device_all','device_delete'])"
-            :ref="scope.row.id"
-            placement="top"
-            width="180">
-            <p>确定删除本条数据吗？</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="$refs[scope.row.id].doClose()">取消</el-button>
-              <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.id)">确定</el-button>
-            </div>
-            <el-button slot="reference" type="danger" size="mini">删除</el-button>
-          </el-popover>
-        </template>
-      </el-table-column>
-    </el-table>
-    <!--分页组件-->
-    <el-pagination
-      :total="total"
-      style="margin-top: 8px;"
-      layout="total, prev, pager, next, sizes"
-      @size-change="sizeChange"
-      @current-change="pageChange"/>
+    <el-row :gutter="28">
+      <el-col :span="6">
+        <el-card class="box-card">
+          <el-tree :data="wdata" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
+        </el-card>
+      </el-col>
+      <el-col :span="18">
+        <!--表格渲染-->
+        <el-card class="box-card">
+          <el-table v-loading="loading" ref="table" :data="data" size="small" border style="width: 100%;" @selection-change="handleSelectionChange">
+            <el-table-column type="selection" width="55" align="center">
+            </el-table-column>
+            <el-table-column label="序号" width="60" align="center">
+              <template slot-scope="scope">
+                <div>{{ scope.$index + 1 }}</div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="hostname" label="IP/域名" width="120"/>
+            <el-table-column prop="sys_hostname" label="设备标签" width="150"/>
+            <el-table-column prop="os_version" label="系统版本"/>
+            <el-table-column label="状态" width="100">
+              <template slot-scope="scope">
+                <span v-if="scope.row.status == 'online'" style="color:#00CC00">在线</span>
+                <span v-else style="color:red">下线</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="150px" align="center">
+              <template slot-scope="scope">
+                <el-button v-if="checkPermission(['admin','device_all','device_list'])" size="mini" type="primary" @click="toDetail(scope.row.id)">详情</el-button>
+                <el-popover
+                  v-if="checkPermission(['admin','device_all','device_delete'])"
+                  :ref="scope.row.id"
+                  placement="top"
+                  width="180">
+                  <p>确定删除本条数据吗？</p>
+                  <div style="text-align: right; margin: 0">
+                    <el-button size="mini" type="text" @click="$refs[scope.row.id].doClose()">取消</el-button>
+                    <el-button :loading="delLoading" type="primary" size="mini" @click="subDelete(scope.row.id)">确定</el-button>
+                  </div>
+                  <el-button slot="reference" type="danger" size="mini">删除</el-button>
+                </el-popover>
+              </template>
+            </el-table-column>
+          </el-table>
+          <!--分页组件-->
+          <el-pagination
+            :total="total"
+            style="margin-top: 8px;"
+            layout="total, prev, pager, next, sizes"
+            @size-change="sizeChange"
+            @current-change="pageChange"/>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -59,6 +69,28 @@ export default {
   mixins: [initData],
   data() {
     return {
+      wdata: [{
+        label: '所有主机',
+        children: [{
+          label: '广东12348项目',
+          children: [{
+            label: '三级 1-1-1',
+            children: [{
+              label: '四级 1-1-1',
+              children: [{
+                label: '五级级 1-1-1',
+                children: [{
+                  label: '六级 1-1-1'
+                }]
+              }]
+            }]
+          }]
+        }]
+      }],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
       delLoading: false, sup_this: this, allSelect: false
     }
   },
@@ -130,6 +162,9 @@ export default {
         path: 'devices/detail',
         query: { id: id }
       })
+    },
+    handleNodeClick(data) {
+      console.log(data)
     }
   }
 }
