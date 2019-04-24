@@ -1,7 +1,7 @@
 
 有问题可以联系QQ157793900 或者push issues
 
-demo地址: http://demo.xufqing.cn
+==demo地址: demo关闭，大多人乱删数据，导致系统异常，实在没心情去维护demo，要测试自己搭环境吧。==
 
 管理员账号:admin 密码admin@1234
 
