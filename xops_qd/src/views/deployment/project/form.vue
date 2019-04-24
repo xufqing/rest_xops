@@ -293,9 +293,7 @@ export default {
       this.env_types = res[0].ENVIRONMENT_TYPE.filter(t => t.key !== 'all')
       this.repo_modes = res[1].REPO_TYPE
     })
-    getDeviceList('Linux').then(res => {
-      this.transfer_data = res
-    })
+    this.getHost()
     if (this.$route.path === '/deploy/projects/detail') {
       this.$nextTick(() => {
         this.init()
@@ -394,6 +392,16 @@ export default {
         repo_url: '',
         repo_mode: ''
       }
+    },
+    getHost() {
+      getDeviceList('Linux').then(res => {
+        const _this = this
+        res.forEach(function(data, index) {
+          data.id = data.id.toString()
+          const host = { key: data.id, label: data.ip }
+          _this.transfer_data.push(host)
+        })
+      })
     }
   }
 }

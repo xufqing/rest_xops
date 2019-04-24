@@ -1,5 +1,5 @@
 from django.urls import path,include
-from cmdb.views import dict,scan,asset,connection,business
+from cmdb.views import dict,scan,asset,connection,business,group
 from rest_framework import routers
 
 router = routers.SimpleRouter()
@@ -8,6 +8,7 @@ router.register(r'scan/devices', scan.DeviceScanInfoViewSet, base_name="scan_dev
 router.register(r'devices', asset.DeviceInfoViewSet, base_name="devices")
 router.register(r'connections', connection.ConnectionInfoViewSet, base_name="connections")
 router.register(r'businesses', business.BusinessViewSet, base_name="businesses")
+router.register(r'groups', group.DeviceGroupViewSet, base_name="groups")
 
 urlpatterns = [
     path(r'api/', include(router.urls)),

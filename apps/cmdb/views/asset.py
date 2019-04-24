@@ -21,7 +21,7 @@ class DeviceInfoViewSet(ModelViewSet):
     '''
     perms_map = (
         {'*': 'admin'}, {'*': 'device_all'}, {'get': 'device_list'}, {'post': 'device_create'}, {'put': 'device_edit'},
-        {'delete': 'device_delete'})
+        {'delete': 'device_delete'}, {'get': 'group_list'})
     queryset = DeviceInfo.objects.all()
     serializer_class = DeviceInfoSerializer
     pagination_class = CommonPagination

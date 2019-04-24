@@ -1,7 +1,5 @@
 # @Time    : 2019/4/13 8:22
 # @Author  : xufqing
-# @Time    : 2019/3/22 13:42
-# @Author  : xufqing
 
 from deployment.models import Project, DeployRecord
 from utils.shell_excu import Shell, connect_init

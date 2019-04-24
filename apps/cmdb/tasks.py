@@ -7,7 +7,6 @@ from .models import DeviceScanInfo
 from rest_xops.celery import app
 info_logger = logging.getLogger('info')
 
-
 @app.task
 def scan_execution():
     scan_settings_load = ScanSettingsLoad()

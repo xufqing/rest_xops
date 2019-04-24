@@ -20,5 +20,6 @@ class DeviceInfoListSerializer(serializers.ModelSerializer):
         fields = ('id','sys_hostname','hostname','auth_type','os_version','status')
 
 class DeviceListSerializer(serializers.Serializer):
-    key = serializers.CharField(source='id')
-    label = serializers.CharField(source='hostname')
+    id = serializers.IntegerField()
+    ip = serializers.CharField(source='hostname')
+    name = serializers.CharField(source='sys_hostname')

@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="warn-content">基础信息</p>
-    <el-form ref="form" :model="form_base" :rules="rules" size="small" label-width="80px">
+    <el-form ref="form" :model="form_base" :rules="rules" size="small" label-width="90px">
       <el-row>
         <el-col :span="12">
           <el-form-item label="主机名">
@@ -57,9 +57,23 @@
         </el-col>
       </el-row>
       <el-row>
-        <el-form-item label="关联业务">
-          <treeselect v-model="businessIds" :multiple="true" :options="businesstree" :disable-branch-nodes="true" style="width: 300px;" placeholder="请选择业务" />
-        </el-form-item>
+        <el-col :span="12">
+          <el-form-item label="关联业务">
+            <treeselect v-model="businessIds" :multiple="true" :options="businesstree" :disable-branch-nodes="true" style="width: 300px;" placeholder="请选择业务" />
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="关联设备组">
+            <el-select v-model="form_base.groups" :disabled="is_Readonly" multiple style="width: 300px;" placeholder="请选择">
+              <el-option
+                v-for="item in group_list"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
@@ -112,6 +126,7 @@ import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import { getKey } from '@/api/dict'
 import { retrieve, edit } from '@/api/device'
 import { getBusinessTree } from '@/api/business'
+import { getGroups } from '@/api/group'
 import { parseTime } from '@/utils/index'
 export default {
   name: 'Base',
@@ -134,9 +149,11 @@ export default {
         os_type: '',
         device_type: '',
         businesses: [],
+        groups: [],
         error_message: ''
       },
       businesstree: [],
+      group_list: [],
       businessIds: [],
       is_Readonly: true,
       types: [{ value: 'password', label: '密码认证' }, { value: 'key_filename', label: '密钥认证' }],
@@ -167,6 +184,7 @@ export default {
         this.device_types = res[0].DEVICE_TYPE
       })
       this.getBusinesses()
+      this.getAllGroup()
     },
     closeTag() {
       this.$store.dispatch('delView', this.$store.state.tagsView.visitedViews.slice(-1)[0])
@@ -227,6 +245,7 @@ export default {
         os_type: '',
         device_type: '',
         businesses: [],
+        groups: [],
         error_message: ''
       }
       this.businessIds = []
@@ -235,6 +254,17 @@ export default {
       getBusinessTree().then(res => {
         this.businesstree = res.detail
       })
+    },
+    getAllGroup() {
+      if (Array.isArray(this.group_list) && this.group_list.length === 0) {
+        getGroups().then(res => {
+          const _this = this
+          res.results.forEach(function(data, index) {
+            const group = { value: data.id, label: data.name }
+            _this.group_list.push(group)
+          })
+        })
+      }
     }
   }
 }

@@ -110,8 +110,9 @@ class Business(AbstractMode, TimeAbstract):
         verbose_name = '业务'
         verbose_name_plural = verbose_name
 
-class DeviceGroup(AbstractMode, TimeAbstract):
+class DeviceGroup(TimeAbstract):
     name = models.CharField(max_length=50, verbose_name='组名')
+    alias = models.CharField(default='', max_length=100, verbose_name='别名')
     desc = models.CharField(max_length=255, blank=True, null=True, verbose_name='备注')
 
     class Meta:
