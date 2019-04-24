@@ -93,8 +93,6 @@ export default {
     resetForm() {
       this.dialog = false
       this.$refs['form'].resetFields()
-      this.permissionIds = []
-      this.menuIds = []
       this.form = { name: '', alias: '', desc: '' }
     }
   }

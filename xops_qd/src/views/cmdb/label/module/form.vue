@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { add, edit } from '@/api/business'
+import { add, edit } from '@/api/label'
 export default {
   props: {
     isAdd: {

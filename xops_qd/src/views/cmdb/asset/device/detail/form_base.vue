@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p class="warn-content">基础信息</p>
     <el-form ref="form" :model="form_base" :rules="rules" size="small" label-width="90px">
       <el-row>
         <el-col :span="12">
@@ -51,19 +50,36 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="MAC地址">
-            <el-input v-model="form_base.mac_address" :readonly="is_Readonly" style="width: 300px;"/>
+          <el-form-item label="标签">
+            <el-select v-model="form_base.labels" :disabled="is_Readonly" multiple style="width: 300px;" placeholder="请选择">
+              <el-option
+                v-for="item in label_list"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="12">
           <el-form-item label="关联业务">
-            <treeselect v-model="businessIds" :multiple="true" :options="businesstree" :disable-branch-nodes="true" style="width: 300px;" placeholder="请选择业务" />
+            <el-select v-model="form_base.businesses" :disabled="is_Readonly" multiple style="width: 300px;" placeholder="请选择">
+              <el-option
+                v-for="item in business_list"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
           </el-form-item>
+          <!-- <el-form-item label="关联业务">
+            <treeselect v-model="businessIds" :multiple="true" :options="businesstree" :disable-branch-nodes="true" style="width: 300px;" placeholder="请选择业务" />
+          </el-form-item> -->
         </el-col>
         <el-col :span="12">
-          <el-form-item label="关联设备组">
+          <el-form-item label="设备组">
             <el-select v-model="form_base.groups" :disabled="is_Readonly" multiple style="width: 300px;" placeholder="请选择">
               <el-option
                 v-for="item in group_list"
@@ -101,36 +117,19 @@
         </div>
       </el-form-item>
     </el-form>
-    <p class="warn-content">配置信息</p>
-    <el-row>
-      <el-col :span="12">
-        <label class="el-form-item__label" style="width: 80px;">CPU</label>
-        <div class="el-form-item__content" style="margin-left: 80px;">
-          <span style="margin-left: 10px;">intelAAACPU</span>
-        </div>
-      </el-col>
-      <el-col :span="12">
-        <label class="el-form-item__label" style="width: 80px;">CPU核数</label>
-        <div class="el-form-item__content" style="margin-left: 80px;">
-          <span style="margin-left: 10px;">12核</span>
-        </div>
-      </el-col>
-    </el-row>
   </div>
 </template>
 
 <script>
 import checkPermission from '@/utils/permission'
-import Treeselect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 import { getKey } from '@/api/dict'
 import { retrieve, edit } from '@/api/device'
-import { getBusinessTree } from '@/api/business'
+import { getBusinesses } from '@/api/business'
 import { getGroups } from '@/api/group'
+import { getLabels } from '@/api/label'
 import { parseTime } from '@/utils/index'
 export default {
   name: 'Base',
-  components: { Treeselect },
   data() {
     return {
       loading: false,
@@ -150,14 +149,15 @@ export default {
         device_type: '',
         businesses: [],
         groups: [],
+        labels: [],
         error_message: ''
       },
-      businesstree: [],
       group_list: [],
-      businessIds: [],
+      label_list: [],
+      business_list: [],
       is_Readonly: true,
       types: [{ value: 'password', label: '密码认证' }, { value: 'key_filename', label: '密钥认证' }],
-      os_types: [{ value: 'Linux', label: 'Linux系统' }, { value: 'Other', label: '其他系统' }],
+      os_types: [{ value: 'Linux', label: 'Linux系统' }, { value: 'Windows', label: 'Windows系统' }, { value: 'Other', label: '其他系统' }],
       device_types: [{ key: 'VM', value: '虚拟机' }, { key: 'key', value: '物理机' }],
       rules: {
         hostname: [
@@ -178,13 +178,13 @@ export default {
         this.form_base = res
         this.form_base.add_time = parseTime(this.form_base.add_time)
         this.form_base.modify_time = parseTime(this.form_base.modify_time)
-        this.businessIds = this.form_base.businesses
       })
       getKey('DEVICE_TYPE').then(res => {
         this.device_types = res[0].DEVICE_TYPE
       })
-      this.getBusinesses()
+      this.getAllBusiness()
       this.getAllGroup()
+      this.getAllLable()
     },
     closeTag() {
       this.$store.dispatch('delView', this.$store.state.tagsView.visitedViews.slice(-1)[0])
@@ -201,11 +201,6 @@ export default {
     doSubmit() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
-          this.form_base.businesses = []
-          const _this = this
-          this.businessIds.forEach(function(data, index) {
-            _this.form_base.businesses.push(data)
-          })
           this.loading = true
           edit(this.form_base.id, this.form_base).then(res => {
             this.resetForm()
@@ -246,14 +241,9 @@ export default {
         device_type: '',
         businesses: [],
         groups: [],
+        labels: [],
         error_message: ''
       }
-      this.businessIds = []
-    },
-    getBusinesses() {
-      getBusinessTree().then(res => {
-        this.businesstree = res.detail
-      })
     },
     getAllGroup() {
       if (Array.isArray(this.group_list) && this.group_list.length === 0) {
@@ -265,11 +255,35 @@ export default {
           })
         })
       }
+    },
+    getAllLable() {
+      if (Array.isArray(this.label_list) && this.label_list.length === 0) {
+        getLabels().then(res => {
+          const _this = this
+          res.results.forEach(function(data, index) {
+            const label = { value: data.id, label: data.name }
+            _this.label_list.push(label)
+          })
+        })
+      }
+    },
+    getAllBusiness() {
+      if (Array.isArray(this.business_list) && this.business_list.length === 0) {
+        getBusinesses().then(res => {
+          const _this = this
+          res.results.forEach(function(data, index) {
+            const business = { value: data.id, label: data.name }
+            _this.business_list.push(business)
+          })
+        })
+      }
     }
   }
 }
 </script>
 
-<style scoped>
-
+<style>
+  .el-select__tags-text {
+    color: #409EFF;
+  }
 </style>

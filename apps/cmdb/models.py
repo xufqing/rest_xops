@@ -35,7 +35,7 @@ class DeviceAbstract(models.Model):
     mac_address = models.CharField(max_length=150, blank=True, default='', verbose_name='MAC地址')
     sn_number = models.CharField(max_length=150, blank=True, default='', verbose_name='SN号码')
     os_type = models.CharField(max_length=50, blank=True, default='', verbose_name='系统类型')
-    os_version = models.CharField(max_length=100, blank=True, default='', verbose_name='系统类型')
+    os_version = models.CharField(max_length=100, blank=True, default='', verbose_name='系统版本')
     device_type = models.CharField(max_length=50, blank=True, default='', verbose_name='设备类型')
     device_model = models.CharField(max_length=150, blank=True, default='', verbose_name='设备型号')
 
@@ -79,7 +79,6 @@ class DeviceInfo(AbstractMode, DeviceAbstract, TimeAbstract):
     auth_type = models.CharField(max_length=30, default='', verbose_name='认证类型')
     hostname = models.CharField(max_length=50, verbose_name='IP/域名')
     network_type = models.IntegerField(blank=True, null=True, verbose_name='网络类型')
-    business_type = models.IntegerField(blank=True, null=True, verbose_name='业务类型')
     leader = models.CharField(max_length=50,blank=True, null=True, verbose_name='责任人')
     buy_date = models.DateField(default=datetime.now, verbose_name="购买日期")
     warranty_date = models.DateField(default=datetime.now, verbose_name="到保日期")
@@ -102,7 +101,7 @@ class DeviceInfo(AbstractMode, DeviceAbstract, TimeAbstract):
     def _history_user(self, value):
         self.changed_by = value
 
-class Business(AbstractMode, TimeAbstract):
+class Business(TimeAbstract):
     name = models.CharField(max_length=50, verbose_name='业务名称')
     desc = models.CharField(max_length=255, blank=True, null=True, verbose_name='备注')
 

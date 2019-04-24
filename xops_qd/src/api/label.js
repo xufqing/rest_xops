@@ -1,16 +1,15 @@
 import request from '@/utils/request'
 
-// 获取所有的business
-export function getBusinesses() {
+export function getLabels() {
   return request({
-    url: 'api/businesses/',
+    url: 'api/labels/',
     method: 'get'
   })
 }
 
 export function add(data) {
   return request({
-    url: 'api/businesses/',
+    url: 'api/labels/',
     method: 'post',
     data
   })
@@ -18,21 +17,21 @@ export function add(data) {
 
 export function del(id) {
   return request({
-    url: 'api/businesses/' + id + '/',
+    url: 'api/labels/' + id + '/',
     method: 'delete'
   })
 }
 
 export function retrieve(id) {
   return request({
-    url: 'api/businesses/' + id + '/',
+    url: 'api/labels/' + id + '/',
     method: 'get'
   })
 }
 
 export function edit(id, data) {
   return request({
-    url: 'api/businesses/' + id + '/',
+    url: 'api/labels/' + id + '/',
     method: 'put',
     data
   })
@@ -40,8 +39,9 @@ export function edit(id, data) {
 
 export function save(id, data) {
   return request({
-    url: 'api/businesses/' + id + '/',
+    url: 'api/labels/' + id + '/',
     method: 'patch',
     data
   })
 }
+

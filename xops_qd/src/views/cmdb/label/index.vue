@@ -11,13 +11,12 @@
             </template>
           </el-table-column>
           <el-table-column prop="name" label="名称"/>
-          <el-table-column v-if="table_show" prop="alias" label="别名"/>
           <el-table-column v-if="table_show" prop="desc" label="描述"/>
           <el-table-column label="操作" align="center">
             <template slot-scope="scope">
-              <edit v-if="checkPermission(['admin','group_all','group_edit'])" :data="scope.row" :sup_this="sup_this"/>
+              <edit v-if="checkPermission(['admin','label_all','label_edit'])" :data="scope.row" :sup_this="sup_this"/>
               <el-popover
-                v-if="checkPermission(['admin','group_all','group_delete'])"
+                v-if="checkPermission(['admin','label_all','label_delete'])"
                 :ref="scope.row.id"
                 placement="top"
                 width="180">
@@ -40,21 +39,13 @@
           @current-change="pageChange"/>
       </el-col>
       <el-col :span="12">
-        <el-card v-if="show && checkPermission(['admin','group_all','group_edit'])" class="box-card">
+        <el-card v-if="show && checkPermission(['admin','label_all','label_edit'])" class="box-card">
           <div slot="header" class="clearfix">
             <span>关联设备</span>
             <el-button-group style="float: right; padding: 4px 10px; margin: 0px 2px;">
               <el-button :loading="Loading" class="filter-item" size="mini" type="success" @click="hostSave">保存</el-button>
               <el-button class="filter-item" size="mini" type="info" @click="cancel()">取消</el-button>
             </el-button-group>
-            <!-- <el-button
-              v-if="checkPermission(['admin','group_all','group_edit'])"
-              :loading="Loading"
-              icon="el-icon-check"
-              size="mini"
-              style="float: right; padding: 4px 10px"
-              type="success"
-              @click="hostSave">保存</el-button> -->
           </div>
           <el-transfer
             v-if="show"
@@ -74,7 +65,7 @@
 <script>
 import checkPermission from '@/utils/permission'
 import initData from '@/mixins/initData'
-import { del, save, retrieve } from '@/api/group'
+import { del, save, retrieve } from '@/api/label'
 import { parseTime } from '@/utils/index'
 import { getDeviceList } from '@/api/device'
 import eHeader from './module/header'
@@ -97,13 +88,16 @@ export default {
   },
   created() {
     this.$nextTick(() => {
-      this.init()
+      this.init_data()
     })
-    this.getHost()
   },
   methods: {
     parseTime,
     checkPermission,
+    init_data() {
+      this.init()
+      this.getHost()
+    },
     handleCurrentChange(val) {
       this.row_data = val
       if (this.row_data) {
@@ -114,7 +108,7 @@ export default {
       this.table_show = false
     },
     beforeInit() {
-      this.url = 'api/groups/'
+      this.url = 'api/labels/'
       const sort = 'id'
       const query = this.query
       const value = query.value
