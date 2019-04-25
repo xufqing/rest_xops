@@ -23,6 +23,7 @@ class DeviceInfoListSerializer(serializers.ModelSerializer):
         model = DeviceInfo
         fields = (
         'id', 'sys_hostname', 'hostname', 'auth_type', 'os_version', 'device_type', 'os_type', 'status', 'groups', 'labels', 'businesses')
+        depth = 1
 
 
 class DeviceListSerializer(serializers.Serializer):

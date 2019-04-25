@@ -27,7 +27,7 @@ class DeviceInfoViewSet(ModelViewSet):
     pagination_class = CommonPagination
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filter_fields = ('status','os_type', 'device_type', 'groups', 'businesses', 'labels')
-    search_fields = ('sys_hostname', 'hostname', 'os_type')
+    search_fields = ('hostname', 'os_type')
     ordering_fields = ('id',)
     authentication_classes = (JSONWebTokenAuthentication,)
     permission_classes = (RbacPermission,)

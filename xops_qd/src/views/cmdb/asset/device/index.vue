@@ -11,7 +11,16 @@
         </template>
       </el-table-column>
       <el-table-column prop="hostname" label="IP/域名" width="120"/>
-      <el-table-column prop="sys_hostname" label="设备标签" width="150"/>
+      <el-table-column label="业务类型" width="120">
+        <template slot-scope="scope">
+          <el-tag v-for="item in scope.row.businesses" :key="item.id" size="small" style="display: inline-block;margin: 0px 2px;">{{ item.name }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column label="设备标签">
+        <template slot-scope="scope">
+          <el-tag v-for="item in scope.row.labels" :key="item.id" size="small" style="display: inline-block;margin: 0px 2px;">{{ item.name }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="os_version" label="系统版本"/>
       <el-table-column label="状态" width="100">
         <template slot-scope="scope">

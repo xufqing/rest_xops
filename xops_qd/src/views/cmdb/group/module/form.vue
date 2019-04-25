@@ -20,6 +20,16 @@
 
 <script>
 import { add, edit } from '@/api/group'
+import { isvalidChinaese } from '@/utils/validate'
+var validChinaese = (rule, value, callback) => {
+  if (!value) {
+    callback(new Error('请输入项目英文名称'))
+  } else if (!isvalidChinaese(value)) {
+    callback(new Error('不能输入中文'))
+  } else {
+    callback()
+  }
+}
 export default {
   props: {
     isAdd: {
@@ -38,6 +48,9 @@ export default {
       rules: {
         name: [
           { required: true, message: '请输入名称', trigger: 'blur' }
+        ],
+        alias: [
+          { required: true, trigger: 'blur', validator: validChinaese }
         ]
       }
     }

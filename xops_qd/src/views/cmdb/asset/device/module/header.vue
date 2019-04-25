@@ -24,11 +24,11 @@
     <el-select v-model="query.groups" clearable placeholder="设备组" class="filter-item" style="width: 192px" @change="toQuery">
       <el-option v-for="item in group_list" :key="item.id" :label="item.name" :value="item.id"/>
     </el-select>
-    <el-select v-model="query.labels" clearable placeholder="标签" class="filter-item" style="width: 192px" @change="toQuery">
-      <el-option v-for="item in label_list" :key="item.id" :label="item.name" :value="item.id"/>
-    </el-select>
     <el-select v-model="query.businesses" clearable placeholder="业务类型" class="filter-item" style="width: 192px" @change="toQuery">
       <el-option v-for="item in business_list" :key="item.id" :label="item.name" :value="item.id"/>
+    </el-select>
+    <el-select v-model="query.labels" clearable placeholder="标签" class="filter-item" style="width: 192px" @change="toQuery">
+      <el-option v-for="item in label_list" :key="item.id" :label="item.name" :value="item.id"/>
     </el-select>
     <el-select v-model="query.device_type" clearable placeholder="设备类型" class="filter-item" style="width: 192px" @change="toQuery">
       <el-option v-for="item in device_types" :key="item.key" :label="item.value" :value="item.key"/>
