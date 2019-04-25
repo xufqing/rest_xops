@@ -1,7 +1,7 @@
 <template>
   <div class="head-container">
     <!-- 搜索 -->
-    <el-input v-model="query.value" clearable placeholder="输入主机名/IP/域名搜索" style="width: 192px;" class="filter-item" @keyup.enter.native="toQuery"/>
+    <el-input v-model="query.value" clearable placeholder="输入IP/域名搜索" style="width: 192px;" class="filter-item" @keyup.enter.native="toQuery"/>
     <el-button class="filter-item" size="mini" type="primary" icon="el-icon-search" @click="toQuery">搜索</el-button>
     <div style="display: inline-block;margin: 0px 2px;">
       <el-button-group>
@@ -10,7 +10,7 @@
         <el-button class="filter-item" size="mini" type="primary" @click="refresh">刷新</el-button>
       </el-button-group>
     </div>
-    <div style="display: inline-block;margin: 0px 6px;float: right">
+    <div style="display: inline-block;margin: 0px 8px;float: right">
       <el-button-group v-if="checkPermission(['admin','device_all'])">
         <el-button
           :loading="updateLoading"

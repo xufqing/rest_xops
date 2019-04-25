@@ -11,8 +11,8 @@
         size="mini"
         type="primary"
         icon="el-icon-plus"
-        @click="$refs.form.dialog = true; getPermissions(); getMenus()">新增</el-button>
-      <eForm ref="form" :permissions="permissions" :menus="menus" :is-add="true"/>
+        @click="$refs.form.dialog = true">新增</el-button>
+      <eForm ref="form" :is-add="true"/>
     </div>
     <!-- 导出 -->
     <el-button v-if="checkPermission(['admin'])" :loading="downloadLoading" size="mini" class="filter-item" type="primary" icon="el-icon-download" @click="download">导出</el-button>
@@ -21,8 +21,6 @@
 
 <script>
 import checkPermission from '@/utils/permission' // 权限判断函数
-import { getMenuTree } from '@/api/menu'
-import { getPermissionTree } from '@/api/permission'
 import { parseTime } from '@/utils/index'
 import eForm from './form'
 // 查询条件
@@ -36,7 +34,7 @@ export default {
   },
   data() {
     return {
-      downloadLoading: false, permissions: [], menus: []
+      downloadLoading: false
     }
   },
   methods: {
@@ -45,21 +43,11 @@ export default {
       this.$parent.page = 1
       this.$parent.init()
     },
-    getMenus() {
-      getMenuTree().then(res => {
-        this.menus = res.detail
-      })
-    },
-    getPermissions() {
-      getPermissionTree().then(res => {
-        this.permissions = res.detail
-      })
-    },
     download() {
       this.downloadLoading = true
       import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['ID', '名称', '描述', '创建日期']
-        const filterVal = ['id', 'name', 'remark', 'createTime']
+        const tHeader = ['ID', '名称', '描述']
+        const filterVal = ['id', 'name', 'desc']
         const data = this.formatJson(filterVal, this.$parent.data)
         excel.export_json_to_excel({
           header: tHeader,

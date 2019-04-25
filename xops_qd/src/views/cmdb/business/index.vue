@@ -41,7 +41,7 @@
       <el-col :span="12">
         <el-card v-if="show && checkPermission(['admin','business_all','business_edit'])" class="box-card">
           <div slot="header" class="clearfix">
-            <span>关联设备</span>
+            <span>关联设备-{{ row_data.name }}</span>
             <el-button-group style="float: right; padding: 4px 10px; margin: 0px 2px;">
               <el-button :loading="Loading" class="filter-item" size="mini" type="success" @click="hostSave">保存</el-button>
               <el-button class="filter-item" size="mini" type="info" @click="cancel()">取消</el-button>
@@ -135,6 +135,7 @@ export default {
       })
     },
     hostSave(id) {
+      this.loading = true
       save(this.row_data.id, { hosts: this.serverIds }).then(res => {
         this.$message({
           showClose: true,
@@ -148,7 +149,6 @@ export default {
         this.loading = false
         console.log(err)
       })
-      console.log(id)
     },
     cancel() {
       this.span1 = 24
@@ -182,6 +182,8 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style>
+  .el-card__header {
+    font-size: 14px;
+  }
 </style>

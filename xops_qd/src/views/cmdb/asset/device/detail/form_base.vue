@@ -74,9 +74,6 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <!-- <el-form-item label="关联业务">
-            <treeselect v-model="businessIds" :multiple="true" :options="businesstree" :disable-branch-nodes="true" style="width: 300px;" placeholder="请选择业务" />
-          </el-form-item> -->
         </el-col>
         <el-col :span="12">
           <el-form-item label="设备组">
@@ -93,14 +90,42 @@
       </el-row>
       <el-row>
         <el-col :span="12">
-          <el-form-item label="入库时间">
-            <span style="margin-left: 10px;">{{ form_base.add_time }}</span>
+          <el-form-item label="购买日期">
+            <el-date-picker
+              v-model="form_base.buy_date"
+              :disabled="is_Readonly"
+              type="date"
+              placeholder="选择日期"
+              value-format="yyyy-MM-dd"
+              style="width: 300px;">
+            </el-date-picker>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="变更时间">
-            <span style="margin-left: 10px;">{{ form_base.modify_time }}</span>
+          <el-form-item label="到保日期">
+            <el-date-picker
+              v-model="form_base.warranty_date"
+              :disabled="is_Readonly"
+              type="date"
+              placeholder="选择日期"
+              value-format="yyyy-MM-dd"
+              style="width: 300px;">
+            </el-date-picker>
           </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <label class="el-form-item__label" style="width: 90px;">入库时间</label>
+          <div class="el-form-item__content" style="margin-left: 90px;">
+            <span style="margin-left: 10px;">{{ form_base.add_time }}</span>
+          </div>
+        </el-col>
+        <el-col :span="12">
+          <label class="el-form-item__label" style="width: 90px;">变更时间</label>
+          <div class="el-form-item__content" style="margin-left: 90px;">
+            <span style="margin-left: 10px;">{{ form_base.modify_time }}</span>
+          </div>
         </el-col>
       </el-row>
       <el-row>
@@ -147,6 +172,8 @@ export default {
         os_version: '',
         os_type: '',
         device_type: '',
+        warranty_date: '',
+        buy_date: '',
         businesses: [],
         groups: [],
         labels: [],
@@ -178,6 +205,7 @@ export default {
         this.form_base = res
         this.form_base.add_time = parseTime(this.form_base.add_time)
         this.form_base.modify_time = parseTime(this.form_base.modify_time)
+        console.log(this)
       })
       getKey('DEVICE_TYPE').then(res => {
         this.device_types = res[0].DEVICE_TYPE
@@ -211,6 +239,7 @@ export default {
               duration: 2500
             })
             this.loading = false
+            this.is_Readonly = true
             this.button = 'edit'
             this.init()
           }).catch(err => {
@@ -239,6 +268,8 @@ export default {
         os_version: '',
         os_type: '',
         device_type: '',
+        warranty_date: '',
+        buy_date: '',
         businesses: [],
         groups: [],
         labels: [],
@@ -285,5 +316,8 @@ export default {
 <style>
   .el-select__tags-text {
     color: #409EFF;
+  }
+  .el-input.is-disabled .el-input__inner {
+    color: #606266;
   }
 </style>

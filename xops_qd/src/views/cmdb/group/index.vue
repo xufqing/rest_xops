@@ -2,7 +2,7 @@
   <div class="app-container">
     <eHeader :query="query"/>
     <el-row :gutter="28">
-      <el-col :span="span1">
+      <el-col :span="span">
         <!--表格渲染-->
         <el-table v-loading="loading" ref="tables" :data="data" highlight-current-row size="small" border style="width: 100%;" @current-change="handleCurrentChange">
           <el-table-column label="序号" width="60" align="center">
@@ -42,19 +42,11 @@
       <el-col :span="12">
         <el-card v-if="show && checkPermission(['admin','group_all','group_edit'])" class="box-card">
           <div slot="header" class="clearfix">
-            <span>关联设备</span>
+            <span>关联设备-{{ row_data.name }}</span>
             <el-button-group style="float: right; padding: 4px 10px; margin: 0px 2px;">
               <el-button :loading="Loading" class="filter-item" size="mini" type="success" @click="hostSave">保存</el-button>
               <el-button class="filter-item" size="mini" type="info" @click="cancel()">取消</el-button>
             </el-button-group>
-            <!-- <el-button
-              v-if="checkPermission(['admin','group_all','group_edit'])"
-              :loading="Loading"
-              icon="el-icon-check"
-              size="mini"
-              style="float: right; padding: 4px 10px"
-              type="success"
-              @click="hostSave">保存</el-button> -->
           </div>
           <el-transfer
             v-if="show"
@@ -85,7 +77,7 @@ export default {
   data() {
     return {
       row_data: null,
-      span1: 24,
+      span: 24,
       show: false,
       table_show: true,
       transfer_name: ['可关联', '已关联'],
@@ -109,7 +101,7 @@ export default {
       if (this.row_data) {
         this.serverIds = this.row_data.hosts
       }
-      this.span1 = 12
+      this.span = 12
       this.show = true
       this.table_show = false
     },
@@ -141,6 +133,7 @@ export default {
       })
     },
     hostSave(id) {
+      this.loading = true
       save(this.row_data.id, { hosts: this.serverIds }).then(res => {
         this.$message({
           showClose: true,
@@ -154,10 +147,9 @@ export default {
         this.loading = false
         console.log(err)
       })
-      console.log(id)
     },
     cancel() {
-      this.span1 = 24
+      this.span = 24
       this.show = false
       this.table_show = true
     },
@@ -188,6 +180,8 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style>
+  .el-card__header {
+    font-size: 14px;
+  }
 </style>
