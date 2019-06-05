@@ -1,5 +1,4 @@
 
-有问题可以联系QQ157793900 或者push issues
 
 demo地址: http://demo.xufqing.cn
 
