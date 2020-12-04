@@ -1,4 +1,5 @@
 **因个人原因，目前开发暂停，坑挖了目前没时间填，，实在意料之外，目前已完成的功能大部分都是完整，项目建议仅作交流学习。**
+** 新坑项目地址：https://github.com/xufqing/anew-server ，后端：golang 、gin、gormV2、go-redis、websocket 前端：react hooks 、antd v4
 
 demo地址: http://demo.xufqing.cn
 
