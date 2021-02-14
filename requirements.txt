@@ -21,7 +21,7 @@ coreapi==2.3.3
 coreschema==0.0.4
 cryptography==2.5
 daphne==2.2.5
-Django==2.1.7
+Django==2.2.13
 django-cors-headers==2.4.0
 django-filter==2.0.0
 django-filters==0.2.1
